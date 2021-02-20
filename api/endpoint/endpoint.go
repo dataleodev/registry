@@ -6,6 +6,35 @@ import (
 	endpoint "github.com/go-kit/kit/endpoint"
 )
 
+// AuthThingRequest collects the request parameters for the AuthThing method.
+type AuthThingRequest struct {
+	Uuid      string `json:"uuid"`
+	AuthToken string `json:"auth_token"`
+}
+
+// AuthThingResponse collects the response parameters for the AuthThing method.
+type AuthThingResponse struct {
+	Node registry.Node `json:"node"`
+	Err  error         `json:"err"`
+}
+
+// MakeAuthThingEndpoint returns an endpoint that invokes AuthThing on the service.
+func MakeAuthThingEndpoint(s registry.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(AuthThingRequest)
+		node, err := s.AuthThing(ctx, req.Uuid, req.AuthToken)
+		return AuthThingResponse{
+			Err:  err,
+			Node: node,
+		}, nil
+	}
+}
+
+// Failed implements Failer.
+func (r AuthThingResponse) Failed() error {
+	return r.Err
+}
+
 // RegisterRequest collects the request parameters for the Register method.
 type RegisterRequest struct {
 	Name     string `json:"name"`
@@ -74,7 +103,7 @@ type ViewUserRequest struct {
 // ViewUserResponse collects the response parameters for the ViewUser method.
 type ViewUserResponse struct {
 	User registry.User `json:"user"`
-	Err  error        `json:"err"`
+	Err  error         `json:"err"`
 }
 
 // MakeViewUserEndpoint returns an endpoint that invokes ViewUser on the service.
@@ -103,7 +132,7 @@ type ListUsersRequest struct {
 // ListUsersResponse collects the response parameters for the ListUsers method.
 type ListUsersResponse struct {
 	Users []registry.User `json:"users"`
-	Err   error  `json:"err"`
+	Err   error           `json:"err"`
 }
 
 // MakeListUsersEndpoint returns an endpoint that invokes ListUsers on the service.
@@ -125,7 +154,7 @@ func (r ListUsersResponse) Failed() error {
 
 // UpdateUserRequest collects the request parameters for the UpdateUser method.
 type UpdateUserRequest struct {
-	Token string       `json:"token"`
+	Token string        `json:"token"`
 	User  registry.User `json:"user"`
 }
 
@@ -176,7 +205,7 @@ func (r ChangePasswordResponse) Failed() error {
 
 // AddNodeRequest collects the request parameters for the AddNode method.
 type AddNodeRequest struct {
-	Token string       `json:"token"`
+	Token string        `json:"token"`
 	Node  registry.Node `json:"node"`
 }
 
@@ -208,7 +237,7 @@ type GetNodeRequest struct {
 // GetNodeResponse collects the response parameters for the GetNode method.
 type GetNodeResponse struct {
 	Node registry.Node `json:"node"`
-	Err  error        `json:"err"`
+	Err  error         `json:"err"`
 }
 
 // MakeGetNodeEndpoint returns an endpoint that invokes GetNode on the service.
@@ -237,7 +266,7 @@ type ListNodesRequest struct {
 // ListNodesResponse collects the response parameters for the ListNodes method.
 type ListNodesResponse struct {
 	Nodes []registry.Node `json:"nodes"`
-	Err   error  `json:"err"`
+	Err   error           `json:"err"`
 }
 
 // MakeListNodesEndpoint returns an endpoint that invokes ListNodes on the service.
@@ -284,8 +313,8 @@ func (r DeleteNodeResponse) Failed() error {
 
 // UpdateNodeRequest collects the request parameters for the UpdateNode method.
 type UpdateNodeRequest struct {
-	Token string       `json:"token"`
-	Id    string       `json:"id"`
+	Token string        `json:"token"`
+	Id    string        `json:"id"`
 	Node  registry.Node `json:"node"`
 }
 
@@ -310,7 +339,7 @@ func (r UpdateNodeResponse) Failed() error {
 
 // AddRegionRequest collects the request parameters for the AddRegion method.
 type AddRegionRequest struct {
-	Token  string         `json:"token"`
+	Token  string          `json:"token"`
 	Region registry.Region `json:"region"`
 }
 
@@ -341,7 +370,7 @@ type ListRegionsRequest struct {
 // ListRegionsResponse collects the response parameters for the ListRegions method.
 type ListRegionsResponse struct {
 	Regions []registry.Region `json:"regions"`
-	Err     error    `json:"err"`
+	Err     error             `json:"err"`
 }
 
 // MakeListRegionsEndpoint returns an endpoint that invokes ListRegions on the service.
@@ -366,6 +395,19 @@ func (r ListRegionsResponse) Failed() error {
 // failed, and if so encode them using a separate write path based on the error.
 type Failure interface {
 	Failed() error
+}
+
+// AuthThing implements Service. Primarily useful in a client.
+func (e Endpoints) AuthThing(ctx context.Context, uuid string, authToken string) (node registry.Node, err error) {
+	request := AuthThingRequest{
+		AuthToken: authToken,
+		Uuid:      uuid,
+	}
+	response, err := e.AuthThingEndpoint(ctx, request)
+	if err != nil {
+		return
+	}
+	return response.(AuthThingResponse).Node, response.(AuthThingResponse).Err
 }
 
 // Register implements Service. Primarily useful in a client.

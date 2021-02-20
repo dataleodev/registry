@@ -14,14 +14,14 @@ const (
 )
 
 //IntToNodeType converts integer to Node Type
-func IntToNodeType(value int)(nodeType Type, name string,err error)  {
-	if value == 0{
+func IntToNodeType(value int) (nodeType Type, name string, err error) {
+	if value == 0 {
 		return Sensor, "sensor", nil
-	}else if value == 1{
+	} else if value == 1 {
 		return Actuator, "actuator", nil
-	}else if value == 2{
+	} else if value == 2 {
 		return Controller, "controller", err
-	}else {
+	} else {
 		err = errors.New("unrecognized value type: valid are 0,1 and 2")
 		return value, "", err
 	}

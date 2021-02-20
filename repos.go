@@ -25,3 +25,9 @@ type RegionRepository interface {
 	List(ctx context.Context) ([]Region, error)
 	Update(ctx context.Context, id string, user Region) (Region, error)
 }
+
+type KeyRepository interface {
+	Add(ctx context.Context, key, value string) (err error)
+	Get(ctx context.Context, key string) (value string, err error)
+	Delete(ctx context.Context, key string) (err error)
+}

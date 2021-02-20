@@ -11,6 +11,31 @@ import (
 	http1 "net/http"
 )
 
+// makeAuthThingHandler creates the handler logic
+func makeAuthThingHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
+	m.Methods("POST").Path("/auth-thing").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.AuthThingEndpoint, decodeAuthThingRequest, encodeAuthThingResponse, options...)))
+}
+
+// decodeAuthThingRequest is a transport/http.DecodeRequestFunc that decodes a
+// JSON-encoded request from the HTTP request body.
+func decodeAuthThingRequest(_ context.Context, r *http1.Request) (interface{}, error) {
+	req := endpoint.AuthThingRequest{}
+	err := json.NewDecoder(r.Body).Decode(&req)
+	return req, err
+}
+
+// encodeAuthThingResponse is a transport/http.EncodeResponseFunc that encodes
+// the response as JSON to the response writer
+func encodeAuthThingResponse(ctx context.Context, w http1.ResponseWriter, response interface{}) (err error) {
+	if f, ok := response.(endpoint.Failure); ok && f.Failed() != nil {
+		ErrorEncoder(ctx, f.Failed(), w)
+		return nil
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	err = json.NewEncoder(w).Encode(response)
+	return
+}
+
 // makeRegisterHandler creates the handler logic
 func makeRegisterHandler(m *mux.Router, endpoints endpoint.Endpoints, options []http.ServerOption) {
 	m.Methods("POST").Path("/register").Handler(handlers.CORS(handlers.AllowedMethods([]string{"POST"}), handlers.AllowedOrigins([]string{"*"}))(http.NewServer(endpoints.RegisterEndpoint, decodeRegisterRequest, encodeRegisterResponse, options...)))

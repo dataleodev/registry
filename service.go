@@ -11,6 +11,7 @@ var (
 
 // Service describes the service.
 type Service interface {
+	AuthThing(ctx context.Context, uuid string, authToken string) (node Node, err error)
 
 	//Register to be used by tools like web dashboards and cli tools
 	//to register admins
@@ -61,6 +62,11 @@ type service struct {
 	hasher  Hasher
 	log     logger.Logger
 	auth    AuthNZ
+}
+
+func (s *service) AuthThing(ctx context.Context, uuid string, authToken string) (node Node, err error) {
+	// TODO implement the business logic of AuthThing
+	return node, err
 }
 
 func (s *service) Register(ctx context.Context, name string, email string, password string) (uuid string, err error) {

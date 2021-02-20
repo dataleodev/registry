@@ -10,6 +10,7 @@ import (
 // meant to be used as a helper struct, to collect all of the endpoints into a
 // single parameter.
 type Endpoints struct {
+	AuthThingEndpoint      endpoint.Endpoint
 	RegisterEndpoint       endpoint.Endpoint
 	LoginEndpoint          endpoint.Endpoint
 	ViewUserEndpoint       endpoint.Endpoint
