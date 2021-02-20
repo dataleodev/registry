@@ -9,12 +9,12 @@ import (
 // ErrGeneratingID indicates error in generating UUID
 var ErrGeneratingID = errors.New("generating id failed")
 
-var _ beanpay.IDProvider = (*uuidProvider)(nil)
+var _ registry.IDProvider = (*uuidProvider)(nil)
 
 type uuidProvider struct{}
 
 // New instantiates a UUID provider.
-func New() beanpay.IDProvider {
+func New() registry.IDProvider {
 	return &uuidProvider{}
 }
 

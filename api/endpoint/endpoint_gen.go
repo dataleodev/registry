@@ -2,7 +2,7 @@
 package endpoint
 
 import (
-	service "github.com/dataleodev/registry/pkg/service"
+	"github.com/dataleodev/registry"
 	endpoint "github.com/go-kit/kit/endpoint"
 )
 
@@ -27,7 +27,7 @@ type Endpoints struct {
 
 // New returns a Endpoints struct that wraps the provided service, and wires in all of the
 // expected endpoint middlewares
-func New(s service.RegistryService, mdw map[string][]endpoint.Middleware) Endpoints {
+func New(s registry.RegistryService, mdw map[string][]endpoint.Middleware) Endpoints {
 	eps := Endpoints{
 		AddNodeEndpoint:        MakeAddNodeEndpoint(s),
 		AddRegionEndpoint:      MakeAddRegionEndpoint(s),

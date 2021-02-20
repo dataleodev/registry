@@ -1,4 +1,4 @@
-package beanpay
+package registry
 
 // Hasher specifies an API for generating hashes of an arbitrary textual
 // content.

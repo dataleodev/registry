@@ -13,12 +13,12 @@ var (
 	errComparePassword = errors.New("Compare hash and password failed")
 )
 
-var _ beanpay.Hasher = (*bcryptHasher)(nil)
+var _ registry.Hasher = (*bcryptHasher)(nil)
 
 type bcryptHasher struct{}
 
 // New instantiates a bcrypt-based hasher implementation.
-func New() beanpay.Hasher {
+func New() registry.Hasher {
 	return &bcryptHasher{}
 }
 

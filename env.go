@@ -1,4 +1,4 @@
-package beanpay
+package registry
 
 import (
 	"os"

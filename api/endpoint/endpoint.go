@@ -2,7 +2,7 @@ package endpoint
 
 import (
 	"context"
-	service "github.com/dataleodev/registry/pkg/service"
+	"github.com/dataleodev/registry"
 	endpoint "github.com/go-kit/kit/endpoint"
 )
 
@@ -20,7 +20,7 @@ type RegisterResponse struct {
 }
 
 // MakeRegisterEndpoint returns an endpoint that invokes Register on the service.
-func MakeRegisterEndpoint(s service.RegistryService) endpoint.Endpoint {
+func MakeRegisterEndpoint(s registry.RegistryService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(RegisterRequest)
 		uuid, err := s.Register(ctx, req.Name, req.Email, req.Password)
@@ -49,7 +49,7 @@ type LoginResponse struct {
 }
 
 // MakeLoginEndpoint returns an endpoint that invokes Login on the service.
-func MakeLoginEndpoint(s service.RegistryService) endpoint.Endpoint {
+func MakeLoginEndpoint(s registry.RegistryService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(LoginRequest)
 		token, err := s.Login(ctx, req.Uuid, req.Password)
@@ -73,12 +73,12 @@ type ViewUserRequest struct {
 
 // ViewUserResponse collects the response parameters for the ViewUser method.
 type ViewUserResponse struct {
-	User service.User `json:"user"`
+	User registry.User `json:"user"`
 	Err  error        `json:"err"`
 }
 
 // MakeViewUserEndpoint returns an endpoint that invokes ViewUser on the service.
-func MakeViewUserEndpoint(s service.RegistryService) endpoint.Endpoint {
+func MakeViewUserEndpoint(s registry.RegistryService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(ViewUserRequest)
 		user, err := s.ViewUser(ctx, req.Token, req.Id)
@@ -102,12 +102,12 @@ type ListUsersRequest struct {
 
 // ListUsersResponse collects the response parameters for the ListUsers method.
 type ListUsersResponse struct {
-	Users []User `json:"users"`
+	Users []registry.User `json:"users"`
 	Err   error  `json:"err"`
 }
 
 // MakeListUsersEndpoint returns an endpoint that invokes ListUsers on the service.
-func MakeListUsersEndpoint(s service.RegistryService) endpoint.Endpoint {
+func MakeListUsersEndpoint(s registry.RegistryService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(ListUsersRequest)
 		users, err := s.ListUsers(ctx, req.Token, req.Args)
@@ -126,7 +126,7 @@ func (r ListUsersResponse) Failed() error {
 // UpdateUserRequest collects the request parameters for the UpdateUser method.
 type UpdateUserRequest struct {
 	Token string       `json:"token"`
-	User  service.User `json:"user"`
+	User  registry.User `json:"user"`
 }
 
 // UpdateUserResponse collects the response parameters for the UpdateUser method.
@@ -135,7 +135,7 @@ type UpdateUserResponse struct {
 }
 
 // MakeUpdateUserEndpoint returns an endpoint that invokes UpdateUser on the service.
-func MakeUpdateUserEndpoint(s service.RegistryService) endpoint.Endpoint {
+func MakeUpdateUserEndpoint(s registry.RegistryService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(UpdateUserRequest)
 		err := s.UpdateUser(ctx, req.Token, req.User)
@@ -161,7 +161,7 @@ type ChangePasswordResponse struct {
 }
 
 // MakeChangePasswordEndpoint returns an endpoint that invokes ChangePassword on the service.
-func MakeChangePasswordEndpoint(s service.RegistryService) endpoint.Endpoint {
+func MakeChangePasswordEndpoint(s registry.RegistryService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(ChangePasswordRequest)
 		err := s.ChangePassword(ctx, req.AuthToken, req.Password, req.OldPassword)
@@ -177,7 +177,7 @@ func (r ChangePasswordResponse) Failed() error {
 // AddNodeRequest collects the request parameters for the AddNode method.
 type AddNodeRequest struct {
 	Token string       `json:"token"`
-	Node  service.Node `json:"node"`
+	Node  registry.Node `json:"node"`
 }
 
 // AddNodeResponse collects the response parameters for the AddNode method.
@@ -186,7 +186,7 @@ type AddNodeResponse struct {
 }
 
 // MakeAddNodeEndpoint returns an endpoint that invokes AddNode on the service.
-func MakeAddNodeEndpoint(s service.RegistryService) endpoint.Endpoint {
+func MakeAddNodeEndpoint(s registry.RegistryService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(AddNodeRequest)
 		err := s.AddNode(ctx, req.Token, req.Node)
@@ -207,12 +207,12 @@ type GetNodeRequest struct {
 
 // GetNodeResponse collects the response parameters for the GetNode method.
 type GetNodeResponse struct {
-	Node service.Node `json:"node"`
+	Node registry.Node `json:"node"`
 	Err  error        `json:"err"`
 }
 
 // MakeGetNodeEndpoint returns an endpoint that invokes GetNode on the service.
-func MakeGetNodeEndpoint(s service.RegistryService) endpoint.Endpoint {
+func MakeGetNodeEndpoint(s registry.RegistryService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(GetNodeRequest)
 		node, err := s.GetNode(ctx, req.Token, req.Id)
@@ -236,12 +236,12 @@ type ListNodesRequest struct {
 
 // ListNodesResponse collects the response parameters for the ListNodes method.
 type ListNodesResponse struct {
-	Nodes []Node `json:"nodes"`
+	Nodes []registry.Node `json:"nodes"`
 	Err   error  `json:"err"`
 }
 
 // MakeListNodesEndpoint returns an endpoint that invokes ListNodes on the service.
-func MakeListNodesEndpoint(s service.RegistryService) endpoint.Endpoint {
+func MakeListNodesEndpoint(s registry.RegistryService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(ListNodesRequest)
 		nodes, err := s.ListNodes(ctx, req.Token, req.Region)
@@ -269,7 +269,7 @@ type DeleteNodeResponse struct {
 }
 
 // MakeDeleteNodeEndpoint returns an endpoint that invokes DeleteNode on the service.
-func MakeDeleteNodeEndpoint(s service.RegistryService) endpoint.Endpoint {
+func MakeDeleteNodeEndpoint(s registry.RegistryService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(DeleteNodeRequest)
 		err := s.DeleteNode(ctx, req.Token, req.Id)
@@ -286,7 +286,7 @@ func (r DeleteNodeResponse) Failed() error {
 type UpdateNodeRequest struct {
 	Token string       `json:"token"`
 	Id    string       `json:"id"`
-	Node  service.Node `json:"node"`
+	Node  registry.Node `json:"node"`
 }
 
 // UpdateNodeResponse collects the response parameters for the UpdateNode method.
@@ -295,7 +295,7 @@ type UpdateNodeResponse struct {
 }
 
 // MakeUpdateNodeEndpoint returns an endpoint that invokes UpdateNode on the service.
-func MakeUpdateNodeEndpoint(s service.RegistryService) endpoint.Endpoint {
+func MakeUpdateNodeEndpoint(s registry.RegistryService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(UpdateNodeRequest)
 		err := s.UpdateNode(ctx, req.Token, req.Id, req.Node)
@@ -311,7 +311,7 @@ func (r UpdateNodeResponse) Failed() error {
 // AddRegionRequest collects the request parameters for the AddRegion method.
 type AddRegionRequest struct {
 	Token  string         `json:"token"`
-	Region service.Region `json:"region"`
+	Region registry.Region `json:"region"`
 }
 
 // AddRegionResponse collects the response parameters for the AddRegion method.
@@ -320,7 +320,7 @@ type AddRegionResponse struct {
 }
 
 // MakeAddRegionEndpoint returns an endpoint that invokes AddRegion on the service.
-func MakeAddRegionEndpoint(s service.RegistryService) endpoint.Endpoint {
+func MakeAddRegionEndpoint(s registry.RegistryService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(AddRegionRequest)
 		err := s.AddRegion(ctx, req.Token, req.Region)
@@ -340,12 +340,12 @@ type ListRegionsRequest struct {
 
 // ListRegionsResponse collects the response parameters for the ListRegions method.
 type ListRegionsResponse struct {
-	Regions []Region `json:"regions"`
+	Regions []registry.Region `json:"regions"`
 	Err     error    `json:"err"`
 }
 
 // MakeListRegionsEndpoint returns an endpoint that invokes ListRegions on the service.
-func MakeListRegionsEndpoint(s service.RegistryService) endpoint.Endpoint {
+func MakeListRegionsEndpoint(s registry.RegistryService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(ListRegionsRequest)
 		regions, err := s.ListRegions(ctx, req.Token)
@@ -396,7 +396,7 @@ func (e Endpoints) Login(ctx context.Context, uuid string, password string) (tok
 }
 
 // ViewUser implements Service. Primarily useful in a client.
-func (e Endpoints) ViewUser(ctx context.Context, token string, id string) (user service.User, err error) {
+func (e Endpoints) ViewUser(ctx context.Context, token string, id string) (user registry.User, err error) {
 	request := ViewUserRequest{
 		Id:    id,
 		Token: token,
@@ -409,7 +409,7 @@ func (e Endpoints) ViewUser(ctx context.Context, token string, id string) (user 
 }
 
 // ListUsers implements Service. Primarily useful in a client.
-func (e Endpoints) ListUsers(ctx context.Context, token string, args map[string]string) (users []User, err error) {
+func (e Endpoints) ListUsers(ctx context.Context, token string, args map[string]string) (users []registry.User, err error) {
 	request := ListUsersRequest{
 		Args:  args,
 		Token: token,
@@ -422,7 +422,7 @@ func (e Endpoints) ListUsers(ctx context.Context, token string, args map[string]
 }
 
 // UpdateUser implements Service. Primarily useful in a client.
-func (e Endpoints) UpdateUser(ctx context.Context, token string, user service.User) (err error) {
+func (e Endpoints) UpdateUser(ctx context.Context, token string, user registry.User) (err error) {
 	request := UpdateUserRequest{
 		Token: token,
 		User:  user,
@@ -449,7 +449,7 @@ func (e Endpoints) ChangePassword(ctx context.Context, authToken string, passwor
 }
 
 // AddNode implements Service. Primarily useful in a client.
-func (e Endpoints) AddNode(ctx context.Context, token string, node service.Node) (err error) {
+func (e Endpoints) AddNode(ctx context.Context, token string, node registry.Node) (err error) {
 	request := AddNodeRequest{
 		Node:  node,
 		Token: token,
@@ -462,7 +462,7 @@ func (e Endpoints) AddNode(ctx context.Context, token string, node service.Node)
 }
 
 // GetNode implements Service. Primarily useful in a client.
-func (e Endpoints) GetNode(ctx context.Context, token string, id string) (node service.Node, err error) {
+func (e Endpoints) GetNode(ctx context.Context, token string, id string) (node registry.Node, err error) {
 	request := GetNodeRequest{
 		Id:    id,
 		Token: token,
@@ -475,7 +475,7 @@ func (e Endpoints) GetNode(ctx context.Context, token string, id string) (node s
 }
 
 // ListNodes implements Service. Primarily useful in a client.
-func (e Endpoints) ListNodes(ctx context.Context, token string, region string) (nodes []Node, err error) {
+func (e Endpoints) ListNodes(ctx context.Context, token string, region string) (nodes []registry.Node, err error) {
 	request := ListNodesRequest{
 		Region: region,
 		Token:  token,
@@ -501,7 +501,7 @@ func (e Endpoints) DeleteNode(ctx context.Context, token string, id string) (err
 }
 
 // UpdateNode implements Service. Primarily useful in a client.
-func (e Endpoints) UpdateNode(ctx context.Context, token string, id string, node service.Node) (err error) {
+func (e Endpoints) UpdateNode(ctx context.Context, token string, id string, node registry.Node) (err error) {
 	request := UpdateNodeRequest{
 		Id:    id,
 		Node:  node,
@@ -515,7 +515,7 @@ func (e Endpoints) UpdateNode(ctx context.Context, token string, id string, node
 }
 
 // AddRegion implements Service. Primarily useful in a client.
-func (e Endpoints) AddRegion(ctx context.Context, token string, region service.Region) (err error) {
+func (e Endpoints) AddRegion(ctx context.Context, token string, region registry.Region) (err error) {
 	request := AddRegionRequest{
 		Region: region,
 		Token:  token,
@@ -528,7 +528,7 @@ func (e Endpoints) AddRegion(ctx context.Context, token string, region service.R
 }
 
 // ListRegions implements Service. Primarily useful in a client.
-func (e Endpoints) ListRegions(ctx context.Context, token string) (regions []Region, err error) {
+func (e Endpoints) ListRegions(ctx context.Context, token string) (regions []registry.Region, err error) {
 	request := ListRegionsRequest{Token: token}
 	response, err := e.ListRegionsEndpoint(ctx, request)
 	if err != nil {

@@ -2,9 +2,9 @@
 package service
 
 import (
-	endpoint "github.com/dataleodev/registry/pkg/endpoint"
-	http1 "github.com/dataleodev/registry/pkg/http"
-	service "github.com/dataleodev/registry/pkg/service"
+	"github.com/dataleodev/registry"
+	endpoint "github.com/dataleodev/registry/api/endpoint"
+	http1 "github.com/dataleodev/registry/api/http"
 	endpoint1 "github.com/go-kit/kit/endpoint"
 	log "github.com/go-kit/kit/log"
 	prometheus "github.com/go-kit/kit/metrics/prometheus"
@@ -52,8 +52,8 @@ func addDefaultEndpointMiddleware(logger log.Logger, duration *prometheus.Summar
 	mw["AddRegion"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "AddRegion")), endpoint.InstrumentingMiddleware(duration.With("method", "AddRegion"))}
 	mw["ListRegions"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "ListRegions")), endpoint.InstrumentingMiddleware(duration.With("method", "ListRegions"))}
 }
-func addDefaultServiceMiddleware(logger log.Logger, mw []service.Middleware) []service.Middleware {
-	return append(mw, service.LoggingMiddleware(logger))
+func addDefaultServiceMiddleware(logger log.Logger, mw []registry.Middleware) []registry.Middleware {
+	return append(mw, registry.LoggingMiddleware(logger))
 }
 func addEndpointMiddlewareToAllMethods(mw map[string][]endpoint1.Middleware, m endpoint1.Middleware) {
 	methods := []string{"Register", "Login", "ViewUser", "ListUsers", "UpdateUser", "ChangePassword", "AddNode", "GetNode", "ListNodes", "DeleteNode", "UpdateNode", "AddRegion", "ListRegions"}

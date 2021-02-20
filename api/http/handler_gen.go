@@ -2,7 +2,7 @@
 package http
 
 import (
-	endpoint "github.com/dataleodev/registry/pkg/endpoint"
+	endpoint "github.com/dataleodev/registry/api/endpoint"
 	http "github.com/go-kit/kit/transport/http"
 	mux "github.com/gorilla/mux"
 	http1 "net/http"

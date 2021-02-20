@@ -1,4 +1,4 @@
-package beanpay
+package registry
 
 // IDProvider specifies an API for generating unique identifiers.
 type IDProvider interface {

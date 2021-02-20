@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	endpoint "github.com/dataleodev/registry/pkg/endpoint"
+	endpoint "github.com/dataleodev/registry/api/endpoint"
 	http "github.com/go-kit/kit/transport/http"
 	handlers "github.com/gorilla/handlers"
 	mux "github.com/gorilla/mux"

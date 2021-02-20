@@ -1,4 +1,4 @@
-package service
+package registry
 
 import (
 	"github.com/dataleodev/registry/pkg/errors"

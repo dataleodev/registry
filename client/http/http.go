@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	endpoint1 "github.com/dataleodev/registry/pkg/endpoint"
-	http2 "github.com/dataleodev/registry/pkg/http"
-	service "github.com/dataleodev/registry/pkg/service"
+	"github.com/dataleodev/registry"
+	endpoint1 "github.com/dataleodev/registry/api/endpoint"
+	http2 "github.com/dataleodev/registry/api/http"
 	endpoint "github.com/go-kit/kit/endpoint"
 	http "github.com/go-kit/kit/transport/http"
 	"io/ioutil"
@@ -18,7 +18,7 @@ import (
 // New returns an AddService backed by an HTTP server living at the remote
 // instance. We expect instance to come from a service discovery system, so
 // likely of the form "host:port".
-func New(instance string, options map[string][]http.ClientOption) (service.RegistryService, error) {
+func New(instance string, options map[string][]http.ClientOption) (registry.RegistryService, error) {
 	if !strings.HasPrefix(instance, "http") {
 		instance = "http://" + instance
 	}

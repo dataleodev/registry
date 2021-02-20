@@ -11,14 +11,14 @@ import (
 // ErrGeneratingID indicates error in generating ULID
 var ErrGeneratingID = errors.New("generating id failed")
 
-var _ beanpay.IDProvider = (*ulidProvider)(nil)
+var _ registry.IDProvider = (*ulidProvider)(nil)
 
 type ulidProvider struct {
 	entropy *mathrand.Rand
 }
 
 // New instantiates a ULID provider.
-func New() beanpay.IDProvider {
+func New() registry.IDProvider {
 	seed := time.Now().UnixNano()
 	source := mathrand.NewSource(seed)
 	return &ulidProvider{

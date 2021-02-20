@@ -4,9 +4,9 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	endpoint "github.com/dataleodev/registry/pkg/endpoint"
-	http1 "github.com/dataleodev/registry/pkg/http"
-	service "github.com/dataleodev/registry/pkg/service"
+	"github.com/dataleodev/registry"
+	endpoint "github.com/dataleodev/registry/api/endpoint"
+	http1 "github.com/dataleodev/registry/api/http"
 	endpoint1 "github.com/go-kit/kit/endpoint"
 	log "github.com/go-kit/kit/log"
 	prometheus "github.com/go-kit/kit/metrics/prometheus"
@@ -84,7 +84,7 @@ func Run() {
 		tracer = opentracinggo.GlobalTracer()
 	}
 
-	svc := service.New(getServiceMiddleware(logger))
+	svc := registry.New(getServiceMiddleware(logger))
 	eps := endpoint.New(svc, getEndpointMiddleware(logger))
 	g := createService(eps)
 	initMetricsEndpoint(g)
@@ -109,8 +109,8 @@ func initHttpHandler(endpoints endpoint.Endpoints, g *group.Group) {
 	})
 
 }
-func getServiceMiddleware(logger log.Logger) (mw []service.Middleware) {
-	mw = []service.Middleware{}
+func getServiceMiddleware(logger log.Logger) (mw []registry.Middleware) {
+	mw = []registry.Middleware{}
 	mw = addDefaultServiceMiddleware(logger, mw)
 	// Append your middleware here
 
