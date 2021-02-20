@@ -1,4 +1,4 @@
-//Copyright (c) Beanworth Co. Ltd
+//
 package errors_test
 
 import (

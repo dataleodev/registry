@@ -1,4 +1,4 @@
-//Copyright (c) Beanworth Co. Ltd
+//
 package errors
 
 // Error specifies an API that must be fullfiled by error type

@@ -18,7 +18,7 @@ import (
 // New returns an AddService backed by an HTTP server living at the remote
 // instance. We expect instance to come from a service discovery system, so
 // likely of the form "host:port".
-func New(instance string, options map[string][]http.ClientOption) (registry.RegistryService, error) {
+func New(instance string, options map[string][]http.ClientOption) (registry.Service, error) {
 	if !strings.HasPrefix(instance, "http") {
 		instance = "http://" + instance
 	}

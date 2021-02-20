@@ -7,17 +7,17 @@ import (
 )
 
 // Middleware describes a service middleware.
-type Middleware func(RegistryService) RegistryService
+type Middleware func(Service) Service
 
 type loggingMiddleware struct {
 	logger log.Logger
-	next   RegistryService
+	next   Service
 }
 
 // LoggingMiddleware takes a logger as a dependency
-// and returns a RegistryService Middleware.
+// and returns a Service Middleware.
 func LoggingMiddleware(logger log.Logger) Middleware {
-	return func(next RegistryService) RegistryService {
+	return func(next Service) Service {
 		return &loggingMiddleware{logger, next}
 	}
 
@@ -103,12 +103,12 @@ func (l loggingMiddleware) ListRegions(ctx context.Context, token string) (regio
 }
 
 type eventsMiddleware struct {
-	next RegistryService
+	next Service
 }
 
-// EventsMiddleware returns a RegistryService Middleware.
+// EventsMiddleware returns a Service Middleware.
 func EventsMiddleware() Middleware {
-	return func(next RegistryService) RegistryService {
+	return func(next Service) Service {
 		return &eventsMiddleware{next}
 	}
 

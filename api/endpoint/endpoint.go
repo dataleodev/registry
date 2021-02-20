@@ -20,7 +20,7 @@ type RegisterResponse struct {
 }
 
 // MakeRegisterEndpoint returns an endpoint that invokes Register on the service.
-func MakeRegisterEndpoint(s registry.RegistryService) endpoint.Endpoint {
+func MakeRegisterEndpoint(s registry.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(RegisterRequest)
 		uuid, err := s.Register(ctx, req.Name, req.Email, req.Password)
@@ -49,7 +49,7 @@ type LoginResponse struct {
 }
 
 // MakeLoginEndpoint returns an endpoint that invokes Login on the service.
-func MakeLoginEndpoint(s registry.RegistryService) endpoint.Endpoint {
+func MakeLoginEndpoint(s registry.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(LoginRequest)
 		token, err := s.Login(ctx, req.Uuid, req.Password)
@@ -78,7 +78,7 @@ type ViewUserResponse struct {
 }
 
 // MakeViewUserEndpoint returns an endpoint that invokes ViewUser on the service.
-func MakeViewUserEndpoint(s registry.RegistryService) endpoint.Endpoint {
+func MakeViewUserEndpoint(s registry.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(ViewUserRequest)
 		user, err := s.ViewUser(ctx, req.Token, req.Id)
@@ -107,7 +107,7 @@ type ListUsersResponse struct {
 }
 
 // MakeListUsersEndpoint returns an endpoint that invokes ListUsers on the service.
-func MakeListUsersEndpoint(s registry.RegistryService) endpoint.Endpoint {
+func MakeListUsersEndpoint(s registry.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(ListUsersRequest)
 		users, err := s.ListUsers(ctx, req.Token, req.Args)
@@ -135,7 +135,7 @@ type UpdateUserResponse struct {
 }
 
 // MakeUpdateUserEndpoint returns an endpoint that invokes UpdateUser on the service.
-func MakeUpdateUserEndpoint(s registry.RegistryService) endpoint.Endpoint {
+func MakeUpdateUserEndpoint(s registry.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(UpdateUserRequest)
 		err := s.UpdateUser(ctx, req.Token, req.User)
@@ -161,7 +161,7 @@ type ChangePasswordResponse struct {
 }
 
 // MakeChangePasswordEndpoint returns an endpoint that invokes ChangePassword on the service.
-func MakeChangePasswordEndpoint(s registry.RegistryService) endpoint.Endpoint {
+func MakeChangePasswordEndpoint(s registry.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(ChangePasswordRequest)
 		err := s.ChangePassword(ctx, req.AuthToken, req.Password, req.OldPassword)
@@ -186,7 +186,7 @@ type AddNodeResponse struct {
 }
 
 // MakeAddNodeEndpoint returns an endpoint that invokes AddNode on the service.
-func MakeAddNodeEndpoint(s registry.RegistryService) endpoint.Endpoint {
+func MakeAddNodeEndpoint(s registry.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(AddNodeRequest)
 		err := s.AddNode(ctx, req.Token, req.Node)
@@ -212,7 +212,7 @@ type GetNodeResponse struct {
 }
 
 // MakeGetNodeEndpoint returns an endpoint that invokes GetNode on the service.
-func MakeGetNodeEndpoint(s registry.RegistryService) endpoint.Endpoint {
+func MakeGetNodeEndpoint(s registry.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(GetNodeRequest)
 		node, err := s.GetNode(ctx, req.Token, req.Id)
@@ -241,7 +241,7 @@ type ListNodesResponse struct {
 }
 
 // MakeListNodesEndpoint returns an endpoint that invokes ListNodes on the service.
-func MakeListNodesEndpoint(s registry.RegistryService) endpoint.Endpoint {
+func MakeListNodesEndpoint(s registry.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(ListNodesRequest)
 		nodes, err := s.ListNodes(ctx, req.Token, req.Region)
@@ -269,7 +269,7 @@ type DeleteNodeResponse struct {
 }
 
 // MakeDeleteNodeEndpoint returns an endpoint that invokes DeleteNode on the service.
-func MakeDeleteNodeEndpoint(s registry.RegistryService) endpoint.Endpoint {
+func MakeDeleteNodeEndpoint(s registry.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(DeleteNodeRequest)
 		err := s.DeleteNode(ctx, req.Token, req.Id)
@@ -295,7 +295,7 @@ type UpdateNodeResponse struct {
 }
 
 // MakeUpdateNodeEndpoint returns an endpoint that invokes UpdateNode on the service.
-func MakeUpdateNodeEndpoint(s registry.RegistryService) endpoint.Endpoint {
+func MakeUpdateNodeEndpoint(s registry.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(UpdateNodeRequest)
 		err := s.UpdateNode(ctx, req.Token, req.Id, req.Node)
@@ -320,7 +320,7 @@ type AddRegionResponse struct {
 }
 
 // MakeAddRegionEndpoint returns an endpoint that invokes AddRegion on the service.
-func MakeAddRegionEndpoint(s registry.RegistryService) endpoint.Endpoint {
+func MakeAddRegionEndpoint(s registry.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(AddRegionRequest)
 		err := s.AddRegion(ctx, req.Token, req.Region)
@@ -345,7 +345,7 @@ type ListRegionsResponse struct {
 }
 
 // MakeListRegionsEndpoint returns an endpoint that invokes ListRegions on the service.
-func MakeListRegionsEndpoint(s registry.RegistryService) endpoint.Endpoint {
+func MakeListRegionsEndpoint(s registry.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(ListRegionsRequest)
 		regions, err := s.ListRegions(ctx, req.Token)
