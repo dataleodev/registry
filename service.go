@@ -55,14 +55,16 @@ type Service interface {
 }
 
 type service struct {
-	users   UserRepository
-	nodes   NodeRepository
-	regions RegionRepository
-	ids     IDProvider
-	hasher  Hasher
-	log     logger.Logger
-	auth    AuthNZ
-	tokenizer Tokenizer
+	users      UserRepository //store users
+	nodes      NodeRepository //store nodes details
+	regions    RegionRepository //store regions details
+	keys       KeyRepository //store keys details
+	ids        IDProvider   //generate uuid v4 ids
+	hasher     Hasher //hash passwords
+	log        logger.Logger //log stuffs
+	auth       AuthNZ  //authenticate
+	tokenizer  Tokenizer
+	randomizer Randomizer
 }
 
 func (s *service) AuthThing(ctx context.Context, uuid string, authToken string) (node Node, err error) {
