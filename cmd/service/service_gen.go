@@ -2,8 +2,7 @@
 package service
 
 import (
-	"github.com/dataleodev/registry"
-	endpoint "github.com/dataleodev/registry/api/endpoint"
+	"github.com/dataleodev/registry/api"
 	http1 "github.com/dataleodev/registry/api/http"
 	endpoint1 "github.com/go-kit/kit/endpoint"
 	log "github.com/go-kit/kit/log"
@@ -14,7 +13,7 @@ import (
 	opentracinggo "github.com/opentracing/opentracing-go"
 )
 
-func createService(endpoints endpoint.Endpoints) (g *group.Group) {
+func createService(endpoints api.Endpoints) (g *group.Group) {
 	g = &group.Group{}
 	initHttpHandler(endpoints, g)
 	return g
@@ -38,22 +37,22 @@ func defaultHttpOptions(logger log.Logger, tracer opentracinggo.Tracer) map[stri
 	return options
 }
 func addDefaultEndpointMiddleware(logger log.Logger, duration *prometheus.Summary, mw map[string][]endpoint1.Middleware) {
-	mw["Register"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "Register")), endpoint.InstrumentingMiddleware(duration.With("method", "Register"))}
-	mw["Login"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "Login")), endpoint.InstrumentingMiddleware(duration.With("method", "Login"))}
-	mw["ViewUser"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "ViewUser")), endpoint.InstrumentingMiddleware(duration.With("method", "ViewUser"))}
-	mw["ListUsers"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "ListUsers")), endpoint.InstrumentingMiddleware(duration.With("method", "ListUsers"))}
-	mw["UpdateUser"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "UpdateUser")), endpoint.InstrumentingMiddleware(duration.With("method", "UpdateUser"))}
-	mw["ChangePassword"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "ChangePassword")), endpoint.InstrumentingMiddleware(duration.With("method", "ChangePassword"))}
-	mw["AddNode"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "AddNode")), endpoint.InstrumentingMiddleware(duration.With("method", "AddNode"))}
-	mw["GetNode"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "GetNode")), endpoint.InstrumentingMiddleware(duration.With("method", "GetNode"))}
-	mw["ListNodes"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "ListNodes")), endpoint.InstrumentingMiddleware(duration.With("method", "ListNodes"))}
-	mw["DeleteNode"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "DeleteNode")), endpoint.InstrumentingMiddleware(duration.With("method", "DeleteNode"))}
-	mw["UpdateNode"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "UpdateNode")), endpoint.InstrumentingMiddleware(duration.With("method", "UpdateNode"))}
-	mw["AddRegion"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "AddRegion")), endpoint.InstrumentingMiddleware(duration.With("method", "AddRegion"))}
-	mw["ListRegions"] = []endpoint1.Middleware{endpoint.LoggingMiddleware(log.With(logger, "method", "ListRegions")), endpoint.InstrumentingMiddleware(duration.With("method", "ListRegions"))}
+	mw["Register"] = []endpoint1.Middleware{api.LoggingMiddleware(log.With(logger, "method", "Register")), api.InstrumentingMiddleware(duration.With("method", "Register"))}
+	mw["Login"] = []endpoint1.Middleware{api.LoggingMiddleware(log.With(logger, "method", "Login")), api.InstrumentingMiddleware(duration.With("method", "Login"))}
+	mw["ViewUser"] = []endpoint1.Middleware{api.LoggingMiddleware(log.With(logger, "method", "ViewUser")), api.InstrumentingMiddleware(duration.With("method", "ViewUser"))}
+	mw["ListUsers"] = []endpoint1.Middleware{api.LoggingMiddleware(log.With(logger, "method", "ListUsers")), api.InstrumentingMiddleware(duration.With("method", "ListUsers"))}
+	mw["UpdateUser"] = []endpoint1.Middleware{api.LoggingMiddleware(log.With(logger, "method", "UpdateUser")), api.InstrumentingMiddleware(duration.With("method", "UpdateUser"))}
+	mw["ChangePassword"] = []endpoint1.Middleware{api.LoggingMiddleware(log.With(logger, "method", "ChangePassword")), api.InstrumentingMiddleware(duration.With("method", "ChangePassword"))}
+	mw["AddNode"] = []endpoint1.Middleware{api.LoggingMiddleware(log.With(logger, "method", "AddNode")), api.InstrumentingMiddleware(duration.With("method", "AddNode"))}
+	mw["GetNode"] = []endpoint1.Middleware{api.LoggingMiddleware(log.With(logger, "method", "GetNode")), api.InstrumentingMiddleware(duration.With("method", "GetNode"))}
+	mw["ListNodes"] = []endpoint1.Middleware{api.LoggingMiddleware(log.With(logger, "method", "ListNodes")), api.InstrumentingMiddleware(duration.With("method", "ListNodes"))}
+	mw["DeleteNode"] = []endpoint1.Middleware{api.LoggingMiddleware(log.With(logger, "method", "DeleteNode")), api.InstrumentingMiddleware(duration.With("method", "DeleteNode"))}
+	mw["UpdateNode"] = []endpoint1.Middleware{api.LoggingMiddleware(log.With(logger, "method", "UpdateNode")), api.InstrumentingMiddleware(duration.With("method", "UpdateNode"))}
+	mw["AddRegion"] = []endpoint1.Middleware{api.LoggingMiddleware(log.With(logger, "method", "AddRegion")), api.InstrumentingMiddleware(duration.With("method", "AddRegion"))}
+	mw["ListRegions"] = []endpoint1.Middleware{api.LoggingMiddleware(log.With(logger, "method", "ListRegions")), api.InstrumentingMiddleware(duration.With("method", "ListRegions"))}
 }
-func addDefaultServiceMiddleware(logger log.Logger, mw []registry.Middleware) []registry.Middleware {
-	return append(mw, registry.LoggingMiddleware(logger))
+func addDefaultServiceMiddleware(logger log.Logger, mw []api.Middleware) []api.Middleware {
+	return append(mw, api.LoggingMiddleware(logger))
 }
 func addEndpointMiddlewareToAllMethods(mw map[string][]endpoint1.Middleware, m endpoint1.Middleware) {
 	methods := []string{"Register", "Login", "ViewUser", "ListUsers", "UpdateUser", "ChangePassword", "AddNode", "GetNode", "ListNodes", "DeleteNode", "UpdateNode", "AddRegion", "ListRegions"}

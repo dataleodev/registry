@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/dataleodev/registry"
-	endpoint1 "github.com/dataleodev/registry/api/endpoint"
+	"github.com/dataleodev/registry/api"
 	http2 "github.com/dataleodev/registry/api/http"
 	endpoint "github.com/go-kit/kit/endpoint"
 	http "github.com/go-kit/kit/transport/http"
@@ -91,7 +91,7 @@ func New(instance string, options map[string][]http.ClientOption) (registry.Serv
 		listRegionsEndpoint = http.NewClient("POST", copyURL(u, "/list-regions"), encodeHTTPGenericRequest, decodeListRegionsResponse, options["ListRegions"]...).Endpoint()
 	}
 
-	return endpoint1.Endpoints{
+	return api.Endpoints{
 		AddNodeEndpoint:        addNodeEndpoint,
 		AddRegionEndpoint:      addRegionEndpoint,
 		ChangePasswordEndpoint: changePasswordEndpoint,
@@ -128,7 +128,7 @@ func decodeAuthThingResponse(_ context.Context, r *http1.Response) (interface{},
 	if r.StatusCode != http1.StatusOK {
 		return nil, http2.ErrorDecoder(r)
 	}
-	var resp endpoint1.AuthThingResponse
+	var resp api.AuthThingResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -141,7 +141,7 @@ func decodeRegisterResponse(_ context.Context, r *http1.Response) (interface{}, 
 	if r.StatusCode != http1.StatusOK {
 		return nil, http2.ErrorDecoder(r)
 	}
-	var resp endpoint1.RegisterResponse
+	var resp api.RegisterResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -154,7 +154,7 @@ func decodeLoginResponse(_ context.Context, r *http1.Response) (interface{}, err
 	if r.StatusCode != http1.StatusOK {
 		return nil, http2.ErrorDecoder(r)
 	}
-	var resp endpoint1.LoginResponse
+	var resp api.LoginResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -167,7 +167,7 @@ func decodeViewUserResponse(_ context.Context, r *http1.Response) (interface{}, 
 	if r.StatusCode != http1.StatusOK {
 		return nil, http2.ErrorDecoder(r)
 	}
-	var resp endpoint1.ViewUserResponse
+	var resp api.ViewUserResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -180,7 +180,7 @@ func decodeListUsersResponse(_ context.Context, r *http1.Response) (interface{},
 	if r.StatusCode != http1.StatusOK {
 		return nil, http2.ErrorDecoder(r)
 	}
-	var resp endpoint1.ListUsersResponse
+	var resp api.ListUsersResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -193,7 +193,7 @@ func decodeUpdateUserResponse(_ context.Context, r *http1.Response) (interface{}
 	if r.StatusCode != http1.StatusOK {
 		return nil, http2.ErrorDecoder(r)
 	}
-	var resp endpoint1.UpdateUserResponse
+	var resp api.UpdateUserResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -206,7 +206,7 @@ func decodeChangePasswordResponse(_ context.Context, r *http1.Response) (interfa
 	if r.StatusCode != http1.StatusOK {
 		return nil, http2.ErrorDecoder(r)
 	}
-	var resp endpoint1.ChangePasswordResponse
+	var resp api.ChangePasswordResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -219,7 +219,7 @@ func decodeAddNodeResponse(_ context.Context, r *http1.Response) (interface{}, e
 	if r.StatusCode != http1.StatusOK {
 		return nil, http2.ErrorDecoder(r)
 	}
-	var resp endpoint1.AddNodeResponse
+	var resp api.AddNodeResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -232,7 +232,7 @@ func decodeGetNodeResponse(_ context.Context, r *http1.Response) (interface{}, e
 	if r.StatusCode != http1.StatusOK {
 		return nil, http2.ErrorDecoder(r)
 	}
-	var resp endpoint1.GetNodeResponse
+	var resp api.GetNodeResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -245,7 +245,7 @@ func decodeListNodesResponse(_ context.Context, r *http1.Response) (interface{},
 	if r.StatusCode != http1.StatusOK {
 		return nil, http2.ErrorDecoder(r)
 	}
-	var resp endpoint1.ListNodesResponse
+	var resp api.ListNodesResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -258,7 +258,7 @@ func decodeDeleteNodeResponse(_ context.Context, r *http1.Response) (interface{}
 	if r.StatusCode != http1.StatusOK {
 		return nil, http2.ErrorDecoder(r)
 	}
-	var resp endpoint1.DeleteNodeResponse
+	var resp api.DeleteNodeResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -271,7 +271,7 @@ func decodeUpdateNodeResponse(_ context.Context, r *http1.Response) (interface{}
 	if r.StatusCode != http1.StatusOK {
 		return nil, http2.ErrorDecoder(r)
 	}
-	var resp endpoint1.UpdateNodeResponse
+	var resp api.UpdateNodeResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -284,7 +284,7 @@ func decodeAddRegionResponse(_ context.Context, r *http1.Response) (interface{},
 	if r.StatusCode != http1.StatusOK {
 		return nil, http2.ErrorDecoder(r)
 	}
-	var resp endpoint1.AddRegionResponse
+	var resp api.AddRegionResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -297,7 +297,7 @@ func decodeListRegionsResponse(_ context.Context, r *http1.Response) (interface{
 	if r.StatusCode != http1.StatusOK {
 		return nil, http2.ErrorDecoder(r)
 	}
-	var resp endpoint1.ListRegionsResponse
+	var resp api.ListRegionsResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }

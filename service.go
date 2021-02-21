@@ -3,8 +3,8 @@ package registry
 import (
 	"context"
 	"fmt"
-	"github.com/dataleodev/registry/logger"
 	"github.com/dataleodev/registry/pkg/errors"
+	"github.com/go-kit/kit/log"
 )
 
 var (
@@ -63,8 +63,7 @@ type service struct {
 	keys       KeyRepository //store keys details
 	ids        IDProvider   //generate uuid v4 ids
 	hasher     Hasher //hash passwords
-	log        logger.Logger //log stuffs
-	auth       AuthNZ  //authenticate
+	log        log.Logger
 	tokenizer  Tokenizer
 	randomizer Randomizer
 }
@@ -122,8 +121,21 @@ func (s *service) Login(ctx context.Context, uuid string, password string) (toke
 	return token, nil
 }
 func (s *service) ViewUser(ctx context.Context, token string, id string) (user User, err error) {
-	// TODO implement the business logic of ViewUser
-	return user, err
+
+	key,err := s.tokenizer.Parse(token)
+	if err != nil {
+		message := errors.New(fmt.Sprintf("invalid token: %v\n",err.Error()))
+		return user, message
+	}
+
+	if key.Subject != id{
+		message := errors.New(fmt.Sprintf("not allowed: id provided %v do not match id requested: %v\n",key.Subject,id))
+		return user, message
+	}
+
+	user, err = s.users.Get(ctx,id)
+
+	return
 }
 func (s *service) ListUsers(ctx context.Context, token string, args map[string]string) (users []User, err error) {
 	// TODO implement the business logic of ListUsers
@@ -167,15 +179,19 @@ func (s *service) ListRegions(ctx context.Context, token string) (regions []Regi
 }
 
 // NewService returns a naive, stateless implementation of Service.
-func NewService() Service {
-	return &service{}
-}
-
-// New returns a Service with all of the expected middleware wired in.
-func New(middleware []Middleware) Service {
-	var svc Service = NewService()
-	for _, m := range middleware {
-		svc = m(svc)
+func NewService(users UserRepository,nodes NodeRepository,
+	regions RegionRepository,keys KeyRepository,id IDProvider,
+	hasher Hasher,logger log.Logger, tokenizer Tokenizer,
+	randomizer Randomizer) Service {
+	return &service{
+		users:      users,
+		nodes:      nodes,
+		regions:    regions,
+		keys:       keys,
+		ids:        id,
+		hasher:     hasher,
+		log:        logger,
+		tokenizer:  tokenizer,
+		randomizer: randomizer,
 	}
-	return svc
 }

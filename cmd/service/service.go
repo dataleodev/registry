@@ -5,7 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/dataleodev/registry"
-	endpoint "github.com/dataleodev/registry/api/endpoint"
+	"github.com/dataleodev/registry/api"
 	http1 "github.com/dataleodev/registry/api/http"
 	endpoint1 "github.com/go-kit/kit/endpoint"
 	log "github.com/go-kit/kit/log"
@@ -85,14 +85,14 @@ func Run() {
 	}
 
 	svc := registry.New(getServiceMiddleware(logger))
-	eps := endpoint.New(svc, getEndpointMiddleware(logger))
+	eps := api.New(svc, getEndpointMiddleware(logger))
 	g := createService(eps)
 	initMetricsEndpoint(g)
 	initCancelInterrupt(g)
 	logger.Log("exit", g.Run())
 
 }
-func initHttpHandler(endpoints endpoint.Endpoints, g *group.Group) {
+func initHttpHandler(endpoints api.Endpoints, g *group.Group) {
 	options := defaultHttpOptions(logger, tracer)
 	// Add your http options here
 
@@ -109,8 +109,8 @@ func initHttpHandler(endpoints endpoint.Endpoints, g *group.Group) {
 	})
 
 }
-func getServiceMiddleware(logger log.Logger) (mw []registry.Middleware) {
-	mw = []registry.Middleware{}
+func getServiceMiddleware(logger log.Logger) (mw []api.Middleware) {
+	mw = []api.Middleware{}
 	mw = addDefaultServiceMiddleware(logger, mw)
 	// Append your middleware here
 

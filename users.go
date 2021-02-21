@@ -28,11 +28,12 @@ var (
 )
 
 type User struct {
-	UUID     string `json:"uuid"`
+	UUID     string `json:"uuid,omitempty"`
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Region   string `json:"region"`
 	Password string `json:"password"`
+	Created string`json:"created,omitempty"`
 }
 
 func (u User) Validate() error {
