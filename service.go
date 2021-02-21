@@ -62,6 +62,7 @@ type service struct {
 	hasher  Hasher
 	log     logger.Logger
 	auth    AuthNZ
+	tokenizer Tokenizer
 }
 
 func (s *service) AuthThing(ctx context.Context, uuid string, authToken string) (node Node, err error) {
@@ -122,14 +123,14 @@ func (s *service) ListRegions(ctx context.Context, token string) (regions []Regi
 	return regions, err
 }
 
-// NewBasicRegistryService returns a naive, stateless implementation of Service.
-func NewBasicRegistryService() Service {
+// NewService returns a naive, stateless implementation of Service.
+func NewService() Service {
 	return &service{}
 }
 
 // New returns a Service with all of the expected middleware wired in.
 func New(middleware []Middleware) Service {
-	var svc Service = NewBasicRegistryService()
+	var svc Service = NewService()
 	for _, m := range middleware {
 		svc = m(svc)
 	}

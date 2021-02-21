@@ -14,6 +14,10 @@ type loggingMiddleware struct {
 	next   Service
 }
 
+func (l loggingMiddleware) AuthThing(ctx context.Context, uuid string, authToken string) (node Node, err error) {
+	panic("implement me")
+}
+
 // LoggingMiddleware takes a logger as a dependency
 // and returns a Service Middleware.
 func LoggingMiddleware(logger log.Logger) Middleware {
@@ -104,6 +108,10 @@ func (l loggingMiddleware) ListRegions(ctx context.Context, token string) (regio
 
 type eventsMiddleware struct {
 	next Service
+}
+
+func (e eventsMiddleware) AuthThing(ctx context.Context, uuid string, authToken string) (node Node, err error) {
+	panic("implement me")
 }
 
 // EventsMiddleware returns a Service Middleware.

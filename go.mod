@@ -3,6 +3,7 @@ module github.com/dataleodev/registry
 go 1.16
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-kit/kit v0.10.0
 	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/gorilla/handlers v1.5.1
