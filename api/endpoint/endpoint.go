@@ -40,6 +40,7 @@ type RegisterRequest struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
+	Region   string `json:"region"`
 }
 
 // RegisterResponse collects the response parameters for the Register method.
@@ -52,7 +53,7 @@ type RegisterResponse struct {
 func MakeRegisterEndpoint(s registry.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(RegisterRequest)
-		uuid, err := s.Register(ctx, req.Name, req.Email, req.Password)
+		uuid, err := s.Register(ctx, req.Name, req.Email, req.Password, req.Region)
 		return RegisterResponse{
 			Err:  err,
 			Uuid: uuid,

@@ -2,7 +2,9 @@ package registry
 
 import (
 	"context"
+	"fmt"
 	"github.com/dataleodev/registry/logger"
+	"github.com/dataleodev/registry/pkg/errors"
 )
 
 var (
@@ -17,7 +19,7 @@ type Service interface {
 	//to register admins
 	//name,email, password are needed, on successful registration
 	//uuid v4, api key will be returned
-	Register(ctx context.Context, name, email, password string) (uuid string, err error)
+	Register(ctx context.Context, name, email, password,region string) (uuid string, err error)
 
 	//Login returns access token with a life of 20 minutes after a user has supplied
 	//uuid, password correctly
@@ -72,13 +74,52 @@ func (s *service) AuthThing(ctx context.Context, uuid string, authToken string) 
 	return node, err
 }
 
-func (s *service) Register(ctx context.Context, name string, email string, password string) (uuid string, err error) {
-	// TODO implement the business logic of Register
-	return uuid, err
+func (s *service) Register(ctx context.Context, name string, email string, password,region string) (uuid string, err error) {
+	uuid,err = s.ids.ID()
+	if err != nil {
+		message := errors.New(fmt.Sprintf("failed to generate unique id : %v\n",err.Error()))
+		return "", message
+	}
+	hashedPassword, err := s.hasher.Hash(password)
+	if err != nil {
+		message := errors.New(fmt.Sprintf("could not hash password : %v\n",err.Error()))
+		return "", message
+	}
+	user := User{
+		UUID:     uuid,
+		Name:     name,
+		Email:    email,
+		Region:   region,
+		Password: hashedPassword,
+	}
+	err = s.users.Add(ctx,user)
+	if err != nil {
+		message := errors.New(fmt.Sprintf("could not persist user to database : %v\n",err.Error()))
+		return "", message
+	}
+	return uuid, nil
 }
 func (s *service) Login(ctx context.Context, uuid string, password string) (token string, err error) {
-	// TODO implement the business logic of Login
-	return token, err
+	user,err := s.users.Get(ctx,uuid)
+	if err != nil {
+		message := errors.New(fmt.Sprintf("could not retrieve user of id : %v : %v\n",uuid,err.Error()))
+		return "", message
+	}
+	err = s.hasher.Compare(user.Password,password)
+	if err != nil {
+		message := errors.New(fmt.Sprintf("invalid ceredentials: %v\n",err.Error()))
+		return "", message
+	}
+
+	key := NewKey(uuid, "access")
+
+	token, err = s.tokenizer.Issue(key)
+
+	if err != nil {
+		message := errors.New(fmt.Sprintf("could not issue new access token: %v\n",err.Error()))
+		return "", message
+	}
+	return token, nil
 }
 func (s *service) ViewUser(ctx context.Context, token string, id string) (user User, err error) {
 	// TODO implement the business logic of ViewUser
