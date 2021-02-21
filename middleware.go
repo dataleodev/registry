@@ -27,11 +27,11 @@ func LoggingMiddleware(logger log.Logger) Middleware {
 
 }
 
-func (l loggingMiddleware) Register(ctx context.Context, name string, email string, password string) (uuid string, err error) {
+func (l loggingMiddleware) Register(ctx context.Context, name string, email string, password,region string) (uuid string, err error) {
 	defer func() {
 		l.logger.Log("method", "Register", "name", name, "email", email, "password", password, "uuid", uuid, "err", err)
 	}()
-	return l.next.Register(ctx, name, email, password)
+	return l.next.Register(ctx, name, email, password,region)
 }
 func (l loggingMiddleware) Login(ctx context.Context, uuid string, password string) (token string, err error) {
 	defer func() {
@@ -121,10 +121,10 @@ func EventsMiddleware() Middleware {
 	}
 
 }
-func (e eventsMiddleware) Register(ctx context.Context, name string, email string, password string) (uuid string, err error) {
+func (e eventsMiddleware) Register(ctx context.Context, name string, email string, password,region string) (uuid string, err error) {
 	// Implement your middleware logic here
 
-	return e.next.Register(ctx, name, email, password)
+	return e.next.Register(ctx, name, email, password,region)
 }
 func (e eventsMiddleware) Login(ctx context.Context, uuid string, password string) (token string, err error) {
 	// Implement your middleware logic here
