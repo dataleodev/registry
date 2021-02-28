@@ -42,7 +42,7 @@ func main() {
 	}
 
 	dbConfig := postgres.DBConfig{
-		Hostname: "localhost",
+		Hostname: "172.17.0.2",
 		Port:     "5432",
 		User:     "postgres",
 		Password: "postgres",
@@ -56,7 +56,7 @@ func main() {
 	tokenizer := jwt.NewTokenizer()
 	hasher := bcrypt.New()
 	up := uuid.New()
-	randomizer := random.New([]rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789!@#$%&abcdefghijklmnopqrstuvwxyz"))
+	randomizer := random.New([]rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789abcdefghijklmnopqrstuvwxyz"))
 	userStore := users.NewRepository(db)
 	nodeStore := nodes.NewRepository(db)
 	regionStore := regions.NewRepository(db)

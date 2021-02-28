@@ -21,12 +21,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
+
+
 // loginCmd represents the login command
 var loginCmd = &cobra.Command{
-	Use:   "login",
+	Use:     "login",
 	Example: "regctl login --id [uuid] --password [password]",
-	Short: "generate access token",
-	Long: `provide username and password to generate 15 minutes valid token.`,
+	Short:   "generate access token",
+	Long:    `provide username and password to generate 15 minutes valid token.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("login called")
 	},

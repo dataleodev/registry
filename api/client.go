@@ -1,116 +1,94 @@
-package http
+package api
 
 import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/dataleodev/registry"
-	"github.com/dataleodev/registry/api"
-	http2 "github.com/dataleodev/registry/api/http"
-	endpoint "github.com/go-kit/kit/endpoint"
-	http "github.com/go-kit/kit/transport/http"
+	"github.com/go-kit/kit/endpoint"
+	kithttp "github.com/go-kit/kit/transport/http"
 	"io/ioutil"
-	http1 "net/http"
+	"net/http"
 	"net/url"
 	"strings"
 )
 
-// New returns an AddService backed by an HTTP server living at the remote
-// instance. We expect instance to come from a service discovery system, so
-// likely of the form "host:port".
-func New(instance string, options map[string][]http.ClientOption) (registry.Service, error) {
+func MakeClientEndpoints(instance string) (e Endpoints, err error) {
 	if !strings.HasPrefix(instance, "http") {
 		instance = "http://" + instance
 	}
-	u, err := url.Parse(instance)
+	tgt, err := url.Parse(instance)
 	if err != nil {
-		return nil, err
+		return Endpoints{}, err
 	}
-	var registerEndpoint endpoint.Endpoint
+	tgt.Path = ""
+
+	var options []kithttp.ClientOption
+
+	var authThingEndpoint endpoint.Endpoint
 	{
-		registerEndpoint = http.NewClient("POST", copyURL(u, "/register"), encodeHTTPGenericRequest, decodeRegisterResponse, options["Register"]...).Endpoint()
+		authThingEndpoint = kithttp.NewClient(
+			http.MethodGet,
+			tgt,
+			encodeAuthThingRequest,
+			decodeAuthThingResponse,
+			options...).Endpoint()
 	}
+
+	var registerEndpoint endpoint.Endpoint
 
 	var loginEndpoint endpoint.Endpoint
-	{
-		loginEndpoint = http.NewClient("POST", copyURL(u, "/login"), encodeHTTPGenericRequest, decodeLoginResponse, options["Login"]...).Endpoint()
-	}
 
 	var viewUserEndpoint endpoint.Endpoint
-	{
-		viewUserEndpoint = http.NewClient("POST", copyURL(u, "/view-user"), encodeHTTPGenericRequest, decodeViewUserResponse, options["ViewUser"]...).Endpoint()
-	}
 
 	var listUsersEndpoint endpoint.Endpoint
-	{
-		listUsersEndpoint = http.NewClient("POST", copyURL(u, "/list-users"), encodeHTTPGenericRequest, decodeListUsersResponse, options["ListUsers"]...).Endpoint()
-	}
 
 	var updateUserEndpoint endpoint.Endpoint
-	{
-		updateUserEndpoint = http.NewClient("POST", copyURL(u, "/update-user"), encodeHTTPGenericRequest, decodeUpdateUserResponse, options["UpdateUser"]...).Endpoint()
-	}
 
 	var changePasswordEndpoint endpoint.Endpoint
-	{
-		changePasswordEndpoint = http.NewClient("POST", copyURL(u, "/change-password"), encodeHTTPGenericRequest, decodeChangePasswordResponse, options["ChangePassword"]...).Endpoint()
-	}
 
 	var addNodeEndpoint endpoint.Endpoint
-	{
-		addNodeEndpoint = http.NewClient("POST", copyURL(u, "/add-node"), encodeHTTPGenericRequest, decodeAddNodeResponse, options["AddNode"]...).Endpoint()
-	}
 
 	var getNodeEndpoint endpoint.Endpoint
-	{
-		getNodeEndpoint = http.NewClient("POST", copyURL(u, "/get-node"), encodeHTTPGenericRequest, decodeGetNodeResponse, options["GetNode"]...).Endpoint()
-	}
 
 	var listNodesEndpoint endpoint.Endpoint
-	{
-		listNodesEndpoint = http.NewClient("POST", copyURL(u, "/list-nodes"), encodeHTTPGenericRequest, decodeListNodesResponse, options["ListNodes"]...).Endpoint()
-	}
 
 	var deleteNodeEndpoint endpoint.Endpoint
-	{
-		deleteNodeEndpoint = http.NewClient("POST", copyURL(u, "/delete-node"), encodeHTTPGenericRequest, decodeDeleteNodeResponse, options["DeleteNode"]...).Endpoint()
-	}
 
 	var updateNodeEndpoint endpoint.Endpoint
-	{
-		updateNodeEndpoint = http.NewClient("POST", copyURL(u, "/update-node"), encodeHTTPGenericRequest, decodeUpdateNodeResponse, options["UpdateNode"]...).Endpoint()
-	}
 
 	var addRegionEndpoint endpoint.Endpoint
-	{
-		addRegionEndpoint = http.NewClient("POST", copyURL(u, "/add-region"), encodeHTTPGenericRequest, decodeAddRegionResponse, options["AddRegion"]...).Endpoint()
-	}
 
 	var listRegionsEndpoint endpoint.Endpoint
-	{
-		listRegionsEndpoint = http.NewClient("POST", copyURL(u, "/list-regions"), encodeHTTPGenericRequest, decodeListRegionsResponse, options["ListRegions"]...).Endpoint()
-	}
 
-	return api.Endpoints{
-		AddNodeEndpoint:        addNodeEndpoint,
-		AddRegionEndpoint:      addRegionEndpoint,
+	e,err = Endpoints{
+		AuthThingEndpoint:      authThingEndpoint,
+		RegisterEndpoint:       registerEndpoint,
+		LoginEndpoint:          loginEndpoint,
+		ViewUserEndpoint:       viewUserEndpoint,
+		ListUsersEndpoint:      listUsersEndpoint,
+		UpdateUserEndpoint:     updateUserEndpoint,
 		ChangePasswordEndpoint: changePasswordEndpoint,
-		DeleteNodeEndpoint:     deleteNodeEndpoint,
+		AddNodeEndpoint:        addNodeEndpoint,
 		GetNodeEndpoint:        getNodeEndpoint,
 		ListNodesEndpoint:      listNodesEndpoint,
-		ListRegionsEndpoint:    listRegionsEndpoint,
-		ListUsersEndpoint:      listUsersEndpoint,
-		LoginEndpoint:          loginEndpoint,
-		RegisterEndpoint:       registerEndpoint,
+		DeleteNodeEndpoint:     deleteNodeEndpoint,
 		UpdateNodeEndpoint:     updateNodeEndpoint,
-		UpdateUserEndpoint:     updateUserEndpoint,
-		ViewUserEndpoint:       viewUserEndpoint,
+		AddRegionEndpoint:      addRegionEndpoint,
+		ListRegionsEndpoint:    listRegionsEndpoint,
 	}, nil
+
+	return
+}
+
+func encodeAuthThingRequest(ctx context.Context, req *http.Request, request interface{}) error {
+	// r.Methods("GET").Path("/auth")
+	req.URL.Path = "/auth"
+	return encodeHTTPGenericRequest(ctx, req, request)
 }
 
 // EncodeHTTPGenericRequest is a transport/http.EncodeRequestFunc that
 // SON-encodes any request to the request body. Primarily useful in a client.
-func encodeHTTPGenericRequest(_ context.Context, r *http1.Request, request interface{}) error {
+func encodeHTTPGenericRequest(_ context.Context, r *http.Request, request interface{}) error {
 	var buf bytes.Buffer
 
 	if err := json.NewEncoder(&buf).Encode(request); err != nil {
@@ -124,11 +102,11 @@ func encodeHTTPGenericRequest(_ context.Context, r *http1.Request, request inter
 // a JSON-encoded concat response from the HTTP response body. If the response
 // as a non-200 status code, we will interpret that as an error and attempt to
 //  decode the specific error message from the response body.
-func decodeAuthThingResponse(_ context.Context, r *http1.Response) (interface{}, error) {
-	if r.StatusCode != http1.StatusOK {
-		return nil, http2.ErrorDecoder(r)
+func decodeAuthThingResponse(_ context.Context, r *http.Response) (interface{}, error) {
+	if r.StatusCode != http.StatusOK {
+		return nil, ErrorDecoder(r)
 	}
-	var resp api.AuthThingResponse
+	var resp AuthThingResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -137,11 +115,11 @@ func decodeAuthThingResponse(_ context.Context, r *http1.Response) (interface{},
 // a JSON-encoded concat response from the HTTP response body. If the response
 // as a non-200 status code, we will interpret that as an error and attempt to
 //  decode the specific error message from the response body.
-func decodeRegisterResponse(_ context.Context, r *http1.Response) (interface{}, error) {
-	if r.StatusCode != http1.StatusOK {
-		return nil, http2.ErrorDecoder(r)
+func decodeRegisterResponse(_ context.Context, r *http.Response) (interface{}, error) {
+	if r.StatusCode != http.StatusOK {
+		return nil,  ErrorDecoder(r)
 	}
-	var resp api.RegisterResponse
+	var resp RegisterResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -150,11 +128,11 @@ func decodeRegisterResponse(_ context.Context, r *http1.Response) (interface{}, 
 // a JSON-encoded concat response from the HTTP response body. If the response
 // as a non-200 status code, we will interpret that as an error and attempt to
 //  decode the specific error message from the response body.
-func decodeLoginResponse(_ context.Context, r *http1.Response) (interface{}, error) {
-	if r.StatusCode != http1.StatusOK {
-		return nil, http2.ErrorDecoder(r)
+func decodeLoginResponse(_ context.Context, r *http.Response) (interface{}, error) {
+	if r.StatusCode != http.StatusOK {
+		return nil,  ErrorDecoder(r)
 	}
-	var resp api.LoginResponse
+	var resp  LoginResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -163,11 +141,11 @@ func decodeLoginResponse(_ context.Context, r *http1.Response) (interface{}, err
 // a JSON-encoded concat response from the HTTP response body. If the response
 // as a non-200 status code, we will interpret that as an error and attempt to
 //  decode the specific error message from the response body.
-func decodeViewUserResponse(_ context.Context, r *http1.Response) (interface{}, error) {
-	if r.StatusCode != http1.StatusOK {
-		return nil, http2.ErrorDecoder(r)
+func decodeViewUserResponse(_ context.Context, r *http.Response) (interface{}, error) {
+	if r.StatusCode != http.StatusOK {
+		return nil,  ErrorDecoder(r)
 	}
-	var resp api.ViewUserResponse
+	var resp  ViewUserResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -176,11 +154,11 @@ func decodeViewUserResponse(_ context.Context, r *http1.Response) (interface{}, 
 // a JSON-encoded concat response from the HTTP response body. If the response
 // as a non-200 status code, we will interpret that as an error and attempt to
 //  decode the specific error message from the response body.
-func decodeListUsersResponse(_ context.Context, r *http1.Response) (interface{}, error) {
-	if r.StatusCode != http1.StatusOK {
-		return nil, http2.ErrorDecoder(r)
+func decodeListUsersResponse(_ context.Context, r *http.Response) (interface{}, error) {
+	if r.StatusCode != http.StatusOK {
+		return nil,  ErrorDecoder(r)
 	}
-	var resp api.ListUsersResponse
+	var resp  ListUsersResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -189,11 +167,11 @@ func decodeListUsersResponse(_ context.Context, r *http1.Response) (interface{},
 // a JSON-encoded concat response from the HTTP response body. If the response
 // as a non-200 status code, we will interpret that as an error and attempt to
 //  decode the specific error message from the response body.
-func decodeUpdateUserResponse(_ context.Context, r *http1.Response) (interface{}, error) {
-	if r.StatusCode != http1.StatusOK {
-		return nil, http2.ErrorDecoder(r)
+func decodeUpdateUserResponse(_ context.Context, r *http.Response) (interface{}, error) {
+	if r.StatusCode != http.StatusOK {
+		return nil,  ErrorDecoder(r)
 	}
-	var resp api.UpdateUserResponse
+	var resp  UpdateUserResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -202,11 +180,11 @@ func decodeUpdateUserResponse(_ context.Context, r *http1.Response) (interface{}
 // a JSON-encoded concat response from the HTTP response body. If the response
 // as a non-200 status code, we will interpret that as an error and attempt to
 //  decode the specific error message from the response body.
-func decodeChangePasswordResponse(_ context.Context, r *http1.Response) (interface{}, error) {
-	if r.StatusCode != http1.StatusOK {
-		return nil, http2.ErrorDecoder(r)
+func decodeChangePasswordResponse(_ context.Context, r *http.Response) (interface{}, error) {
+	if r.StatusCode != http.StatusOK {
+		return nil,  ErrorDecoder(r)
 	}
-	var resp api.ChangePasswordResponse
+	var resp  ChangePasswordResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -215,11 +193,11 @@ func decodeChangePasswordResponse(_ context.Context, r *http1.Response) (interfa
 // a JSON-encoded concat response from the HTTP response body. If the response
 // as a non-200 status code, we will interpret that as an error and attempt to
 //  decode the specific error message from the response body.
-func decodeAddNodeResponse(_ context.Context, r *http1.Response) (interface{}, error) {
-	if r.StatusCode != http1.StatusOK {
-		return nil, http2.ErrorDecoder(r)
+func decodeAddNodeResponse(_ context.Context, r *http.Response) (interface{}, error) {
+	if r.StatusCode != http.StatusOK {
+		return nil,  ErrorDecoder(r)
 	}
-	var resp api.AddNodeResponse
+	var resp  AddNodeResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -228,11 +206,11 @@ func decodeAddNodeResponse(_ context.Context, r *http1.Response) (interface{}, e
 // a JSON-encoded concat response from the HTTP response body. If the response
 // as a non-200 status code, we will interpret that as an error and attempt to
 //  decode the specific error message from the response body.
-func decodeGetNodeResponse(_ context.Context, r *http1.Response) (interface{}, error) {
-	if r.StatusCode != http1.StatusOK {
-		return nil, http2.ErrorDecoder(r)
+func decodeGetNodeResponse(_ context.Context, r *http.Response) (interface{}, error) {
+	if r.StatusCode != http.StatusOK {
+		return nil,  ErrorDecoder(r)
 	}
-	var resp api.GetNodeResponse
+	var resp  GetNodeResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -241,11 +219,11 @@ func decodeGetNodeResponse(_ context.Context, r *http1.Response) (interface{}, e
 // a JSON-encoded concat response from the HTTP response body. If the response
 // as a non-200 status code, we will interpret that as an error and attempt to
 //  decode the specific error message from the response body.
-func decodeListNodesResponse(_ context.Context, r *http1.Response) (interface{}, error) {
-	if r.StatusCode != http1.StatusOK {
-		return nil, http2.ErrorDecoder(r)
+func decodeListNodesResponse(_ context.Context, r *http.Response) (interface{}, error) {
+	if r.StatusCode != http.StatusOK {
+		return nil,  ErrorDecoder(r)
 	}
-	var resp api.ListNodesResponse
+	var resp  ListNodesResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -254,11 +232,11 @@ func decodeListNodesResponse(_ context.Context, r *http1.Response) (interface{},
 // a JSON-encoded concat response from the HTTP response body. If the response
 // as a non-200 status code, we will interpret that as an error and attempt to
 //  decode the specific error message from the response body.
-func decodeDeleteNodeResponse(_ context.Context, r *http1.Response) (interface{}, error) {
-	if r.StatusCode != http1.StatusOK {
-		return nil, http2.ErrorDecoder(r)
+func decodeDeleteNodeResponse(_ context.Context, r *http.Response) (interface{}, error) {
+	if r.StatusCode != http.StatusOK {
+		return nil,  ErrorDecoder(r)
 	}
-	var resp api.DeleteNodeResponse
+	var resp  DeleteNodeResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -267,11 +245,11 @@ func decodeDeleteNodeResponse(_ context.Context, r *http1.Response) (interface{}
 // a JSON-encoded concat response from the HTTP response body. If the response
 // as a non-200 status code, we will interpret that as an error and attempt to
 //  decode the specific error message from the response body.
-func decodeUpdateNodeResponse(_ context.Context, r *http1.Response) (interface{}, error) {
-	if r.StatusCode != http1.StatusOK {
-		return nil, http2.ErrorDecoder(r)
+func decodeUpdateNodeResponse(_ context.Context, r *http.Response) (interface{}, error) {
+	if r.StatusCode != http.StatusOK {
+		return nil,  ErrorDecoder(r)
 	}
-	var resp api.UpdateNodeResponse
+	var resp  UpdateNodeResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -280,11 +258,11 @@ func decodeUpdateNodeResponse(_ context.Context, r *http1.Response) (interface{}
 // a JSON-encoded concat response from the HTTP response body. If the response
 // as a non-200 status code, we will interpret that as an error and attempt to
 //  decode the specific error message from the response body.
-func decodeAddRegionResponse(_ context.Context, r *http1.Response) (interface{}, error) {
-	if r.StatusCode != http1.StatusOK {
-		return nil, http2.ErrorDecoder(r)
+func decodeAddRegionResponse(_ context.Context, r *http.Response) (interface{}, error) {
+	if r.StatusCode != http.StatusOK {
+		return nil,  ErrorDecoder(r)
 	}
-	var resp api.AddRegionResponse
+	var resp  AddRegionResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -293,11 +271,11 @@ func decodeAddRegionResponse(_ context.Context, r *http1.Response) (interface{},
 // a JSON-encoded concat response from the HTTP response body. If the response
 // as a non-200 status code, we will interpret that as an error and attempt to
 //  decode the specific error message from the response body.
-func decodeListRegionsResponse(_ context.Context, r *http1.Response) (interface{}, error) {
-	if r.StatusCode != http1.StatusOK {
-		return nil, http2.ErrorDecoder(r)
+func decodeListRegionsResponse(_ context.Context, r *http.Response) (interface{}, error) {
+	if r.StatusCode != http.StatusOK {
+		return nil,  ErrorDecoder(r)
 	}
-	var resp api.ListRegionsResponse
+	var resp  ListRegionsResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -307,3 +285,4 @@ func copyURL(base *url.URL, path string) (next *url.URL) {
 	next = &n
 	return
 }
+

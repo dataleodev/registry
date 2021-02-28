@@ -3,9 +3,11 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
+	_ "github.com/lib/pq"
 )
 
-//hostname = "localhost"
+//  hostname = "localhost" for locally run postgres and
+//  hostname = "172.17.0.2" for locally run postgres docker container
 //	port     = "5432"
 //	user     = "postgres"
 //	password = "postgres"

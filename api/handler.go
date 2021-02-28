@@ -38,7 +38,7 @@ func MakeHTTPHandler(svc registry.Service, logger log.Logger) http.Handler {
 		options...,
 	))
 
-	r.Methods(http.MethodGet).Path("/auth").Handler(kithttp.NewServer(
+	r.Methods(http.MethodGet).Path("/auth/{id}").Handler(kithttp.NewServer(
 		e.AuthThingEndpoint,
 		decodeAuthThingRequest,
 		encodeAuthThingResponse,
