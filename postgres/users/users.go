@@ -8,6 +8,7 @@ import (
 	"github.com/dataleodev/registry/pkg/errors"
 	regsql "github.com/dataleodev/registry/sql"
 	"os"
+	"time"
 )
 
 var _ registry.UserRepository = (*postgres)(nil)
@@ -41,6 +42,7 @@ func (u dbUser) toUser() registry.User {
 func fromUser(user registry.User) (dbUser, error) {
 
 //	now, err := time.Parse(time.RFC3339, user.Created)
+	now := time.Now().Format(time.RFC3339)
 
 //	if err != nil {
 //		return dbUser{}, err
@@ -51,7 +53,7 @@ func fromUser(user registry.User) (dbUser, error) {
 		Email:    user.Email,
 		Password: user.Password,
 		Region:   user.Region,
-		Created:  user.Created,
+		Created:  now,
 	}, nil
 }
 

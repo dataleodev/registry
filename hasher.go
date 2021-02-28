@@ -4,9 +4,9 @@ package registry
 // content.
 type Hasher interface {
 	// Hash generates the hashed string from plain-text.
-	Hash(string) (string, error)
+	Hash(plain string) (hash string, err error)
 
 	// Compare compares plain-text version to the hashed one. An error should
 	// indicate failed comparison.
-	Compare(string, string) error
+	Compare(plaintext string, hashed string) error
 }

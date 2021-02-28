@@ -104,7 +104,7 @@ func (s *service) Login(ctx context.Context, uuid string, password string) (toke
 		message := errors.New(fmt.Sprintf("could not retrieve user of id : %v : %v\n",uuid,err.Error()))
 		return "", message
 	}
-	err = s.hasher.Compare(user.Password,password)
+	err = s.hasher.Compare(password,user.Password)
 	if err != nil {
 		message := errors.New(fmt.Sprintf("invalid ceredentials: %v\n",err.Error()))
 		return "", message
