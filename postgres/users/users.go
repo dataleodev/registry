@@ -5,10 +5,9 @@ import (
 	"database/sql"
 	"github.com/dataleodev/registry"
 	"github.com/dataleodev/registry/logger"
-	regsql "github.com/dataleodev/registry/sql"
 	"github.com/dataleodev/registry/pkg/errors"
+	regsql "github.com/dataleodev/registry/sql"
 	"os"
-	"time"
 )
 
 var _ registry.UserRepository = (*postgres)(nil)
@@ -25,7 +24,7 @@ type dbUser struct {
 	Email    string    `json:"email"`                         //email
 	Password string    `json:"password,omitempty"`            //password of user
 	Region   string    `json:"region_of_operation,omitempty"` //operating region in case of multi cloud
-	Created  time.Time `json:"created,omitempty"`
+	Created  string `json:"created,omitempty"`
 }
 
 func (u dbUser) toUser() registry.User {
@@ -35,24 +34,24 @@ func (u dbUser) toUser() registry.User {
 		Email:    u.Email,
 		Password: u.Password,
 		Region:   u.Region,
-		Created:  u.Created.Format(time.RFC3339),
+		Created:  u.Created,
 	}
 }
 
 func fromUser(user registry.User) (dbUser, error) {
 
-	now, err := time.Parse(time.RFC3339, user.Created)
+//	now, err := time.Parse(time.RFC3339, user.Created)
 
-	if err != nil {
-		return dbUser{}, err
-	}
+//	if err != nil {
+//		return dbUser{}, err
+//	}
 	return dbUser{
 		ID:       user.UUID,
 		Name:     user.Name,
 		Email:    user.Email,
 		Password: user.Password,
 		Region:   user.Region,
-		Created:  now,
+		Created:  user.Created,
 	}, nil
 }
 
