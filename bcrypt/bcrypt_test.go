@@ -9,17 +9,17 @@ func TestCompare(t *testing.T) {
 	password := "root"
 
 	t.Run("hasher", func(t *testing.T) {
-		hash,err := bc.Hash(password)
+		hash, err := bc.Hash(password)
 		if err != nil {
-			t.Errorf("could not hash %v\n",err)
+			t.Errorf("could not hash %v\n", err)
 		}
 
-	//	err = bc.Compare(hash,password)
+		//	err = bc.Compare(hash,password)
 		//t.Logf("%v\n",err)
 
 		//t.Logf("password then hash: %v\n",err)
-		err = bc.Compare(password,hash)
-		t.Logf("%v\n",err)
+		err = bc.Compare(password, hash)
+		t.Logf("%v\n", err)
 
 	})
 

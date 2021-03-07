@@ -18,19 +18,18 @@ var (
 	ErrUserNotUpdated = errors.New("user not updated")
 )
 
-
 type dbUser struct {
-	ID       string    `json:"id,omitempty"`                  //id or user token | uuid
-	Name     string    `json:"name"`                          //fullname
-	Email    string    `json:"email"`                         //email
-	Password string    `json:"password,omitempty"`            //password of user
-	Region   string    `json:"region_of_operation,omitempty"` //operating region in case of multi cloud
+	ID       string `json:"id,omitempty"`                  //id or user token | uuid
+	Name     string `json:"name"`                          //fullname
+	Email    string `json:"email"`                         //email
+	Password string `json:"password,omitempty"`            //password of user
+	Region   string `json:"region_of_operation,omitempty"` //operating region in case of multi cloud
 	Created  string `json:"created,omitempty"`
 }
 
 func (u dbUser) toUser() registry.User {
 	return registry.User{
-		UUID:       u.ID,
+		UUID:     u.ID,
 		Name:     u.Name,
 		Email:    u.Email,
 		Password: u.Password,
@@ -41,12 +40,12 @@ func (u dbUser) toUser() registry.User {
 
 func fromUser(user registry.User) (dbUser, error) {
 
-//	now, err := time.Parse(time.RFC3339, user.Created)
+	//	now, err := time.Parse(time.RFC3339, user.Created)
 	now := time.Now().Format(time.RFC3339)
 
-//	if err != nil {
-//		return dbUser{}, err
-//	}
+	//	if err != nil {
+	//		return dbUser{}, err
+	//	}
 	return dbUser{
 		ID:       user.UUID,
 		Name:     user.Name,
@@ -58,14 +57,14 @@ func fromUser(user registry.User) (dbUser, error) {
 }
 
 type postgres struct {
-	db *sql.DB
+	db       *sql.DB
 	dbLogger logger.Logger
 }
 
-func NewRepository(db *sql.DB)registry.UserRepository {
+func NewRepository(db *sql.DB) registry.UserRepository {
 	dlog, _ := logger.New(os.Stdout, "debug")
 	return &postgres{
-		db: db,
+		db:       db,
 		dbLogger: dlog,
 	}
 }
@@ -77,7 +76,7 @@ func (p postgres) Get(ctx context.Context, id string) (registry.User, error) {
 
 	switch err := row.Scan(
 		&dUser.ID, &dUser.Name, &dUser.Email,
-		&dUser.Password,&dUser.Region, &dUser.Created); err {
+		&dUser.Password, &dUser.Region, &dUser.Created); err {
 
 	case sql.ErrNoRows:
 		return registry.User{}, ErrUserNotFound
@@ -99,7 +98,7 @@ func (p postgres) Add(ctx context.Context, user registry.User) error {
 	}
 
 	_, err = p.db.Exec(regsql.UserInsertNew,
-		dUser.ID, dUser.Name, dUser.Email, dUser.Password,dUser.Region, dUser.Created)
+		dUser.ID, dUser.Name, dUser.Email, dUser.Password, dUser.Region, dUser.Created)
 
 	if err != nil {
 		return err
@@ -119,5 +118,3 @@ func (p postgres) List(ctx context.Context) ([]registry.User, error) {
 func (p postgres) Update(ctx context.Context, id string, user registry.User) (registry.User, error) {
 	panic("implement me")
 }
-
-

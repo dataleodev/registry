@@ -15,7 +15,7 @@ type Commands struct {
 	Config   *cobra.Command
 }
 
-func MakeAllCommands() Commands{
+func MakeAllCommands() Commands {
 	return Commands{
 		Login:    nil,
 		Register: nil,

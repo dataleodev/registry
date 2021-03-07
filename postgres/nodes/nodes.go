@@ -12,8 +12,7 @@ type postgres struct {
 	db *sql.DB
 }
 
-
-func NewRepository(db *sql.DB)registry.NodeRepository {
+func NewRepository(db *sql.DB) registry.NodeRepository {
 	return &postgres{
 		db: db,
 	}

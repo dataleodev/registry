@@ -12,7 +12,7 @@ type postgres struct {
 	db *sql.DB
 }
 
-func NewRepository(db *sql.DB)registry.RegionRepository {
+func NewRepository(db *sql.DB) registry.RegionRepository {
 	return &postgres{
 		db: db,
 	}
@@ -37,10 +37,3 @@ func (p postgres) List(ctx context.Context) ([]registry.Region, error) {
 func (p postgres) Update(ctx context.Context, id string, user registry.Region) (registry.Region, error) {
 	panic("implement me")
 }
-
-
-
-
-
-
-

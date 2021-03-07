@@ -33,7 +33,7 @@ type User struct {
 	Email    string `json:"email"`
 	Region   string `json:"region"`
 	Password string `json:"password"`
-	Created string`json:"created,omitempty"`
+	Created  string `json:"created,omitempty"`
 }
 
 func (u User) Validate() error {

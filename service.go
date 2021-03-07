@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/dataleodev/registry/pkg/errors"
 	"github.com/go-kit/kit/log"
+	"time"
 )
 
 var (
@@ -13,13 +14,17 @@ var (
 
 // Service describes the service.
 type Service interface {
+
+	//AuthThing verifies if the uuid and authToken given
+	//to a node is correct. This will be called
+	//by HTTPClient
 	AuthThing(ctx context.Context, uuid string, authToken string) (node Node, err error)
 
 	//Register to be used by tools like web dashboards and cli tools
 	//to register admins
 	//name,email, password are needed, on successful registration
 	//uuid v4, api key will be returned
-	Register(ctx context.Context, name, email, password,region string) (uuid string, err error)
+	Register(ctx context.Context, name, email, password, region string) (uuid string, err error)
 
 	//Login returns access token with a life of 20 minutes after a user has supplied
 	//uuid, password correctly
@@ -57,31 +62,40 @@ type Service interface {
 }
 
 type service struct {
-	users      UserRepository //store users
-	nodes      NodeRepository //store nodes details
+	users      UserRepository   //store users
+	nodes      NodeRepository   //store nodes details
 	regions    RegionRepository //store regions details
-	keys       KeyRepository //store keys details
-	ids        IDProvider   //generate uuid v4 ids
-	hasher     Hasher //hash passwords
+	keys       KeyRepository    //store keys details
+	ids        IDProvider       //generate uuid v4 ids
+	hasher     Hasher           //hash passwords
 	log        log.Logger
 	tokenizer  Tokenizer
 	randomizer Randomizer
 }
 
-func (s *service) AuthThing(ctx context.Context, uuid string, authToken string) (node Node, err error) {
-	// TODO implement the business logic of AuthThing
-	return node, err
+func (s *service) AuthThing(ctx context.Context, nodeId string, authToken string) (node Node, err error) {
+	_, err = s.tokenizer.Parse(authToken)
+	if err != nil {
+		message := errors.New(fmt.Sprintf("invalid token: %v\n", err.Error()))
+		return Node{}, message
+	}
+
+	//todo: check for allowed apps (regctl) and people
+
+	node,err = s.nodes.Get(ctx,nodeId)
+
+	return
 }
 
-func (s *service) Register(ctx context.Context, name string, email string, password,region string) (uuid string, err error) {
-	uuid,err = s.ids.ID()
+func (s *service) Register(ctx context.Context, name string, email string, password, region string) (uuid string, err error) {
+	uuid, err = s.ids.ID()
 	if err != nil {
-		message := errors.New(fmt.Sprintf("failed to generate unique id : %v\n",err.Error()))
+		message := errors.New(fmt.Sprintf("failed to generate unique id : %v\n", err.Error()))
 		return "", message
 	}
 	hashedPassword, err := s.hasher.Hash(password)
 	if err != nil {
-		message := errors.New(fmt.Sprintf("could not hash password : %v\n",err.Error()))
+		message := errors.New(fmt.Sprintf("could not hash password : %v\n", err.Error()))
 		return "", message
 	}
 	user := User{
@@ -91,22 +105,22 @@ func (s *service) Register(ctx context.Context, name string, email string, passw
 		Region:   region,
 		Password: hashedPassword,
 	}
-	err = s.users.Add(ctx,user)
+	err = s.users.Add(ctx, user)
 	if err != nil {
-		message := errors.New(fmt.Sprintf("could not persist user to database : %v\n",err.Error()))
+		message := errors.New(fmt.Sprintf("could not persist user to database : %v\n", err.Error()))
 		return "", message
 	}
 	return uuid, nil
 }
 func (s *service) Login(ctx context.Context, uuid string, password string) (token string, err error) {
-	user,err := s.users.Get(ctx,uuid)
+	user, err := s.users.Get(ctx, uuid)
 	if err != nil {
-		message := errors.New(fmt.Sprintf("could not retrieve user of id : %v : %v\n",uuid,err.Error()))
+		message := errors.New(fmt.Sprintf("could not retrieve user of id : %v : %v\n", uuid, err.Error()))
 		return "", message
 	}
-	err = s.hasher.Compare(password,user.Password)
+	err = s.hasher.Compare(password, user.Password)
 	if err != nil {
-		message := errors.New(fmt.Sprintf("invalid ceredentials: %v\n",err.Error()))
+		message := errors.New(fmt.Sprintf("invalid ceredentials: %v\n", err.Error()))
 		return "", message
 	}
 
@@ -115,25 +129,25 @@ func (s *service) Login(ctx context.Context, uuid string, password string) (toke
 	token, err = s.tokenizer.Issue(key)
 
 	if err != nil {
-		message := errors.New(fmt.Sprintf("could not issue new access token: %v\n",err.Error()))
+		message := errors.New(fmt.Sprintf("could not issue new access token: %v\n", err.Error()))
 		return "", message
 	}
 	return token, nil
 }
 func (s *service) ViewUser(ctx context.Context, token string, id string) (user User, err error) {
 
-	key,err := s.tokenizer.Parse(token)
+	key, err := s.tokenizer.Parse(token)
 	if err != nil {
-		message := errors.New(fmt.Sprintf("invalid token: %v\n",err.Error()))
+		message := errors.New(fmt.Sprintf("invalid token: %v\n", err.Error()))
 		return user, message
 	}
 
-	if key.Subject != id{
-		message := errors.New(fmt.Sprintf("not allowed: id provided %v do not match id requested: %v\n",key.Subject,id))
+	if key.Subject != id {
+		message := errors.New(fmt.Sprintf("not allowed: id provided %v do not match id requested: %v\n", key.Subject, id))
 		return user, message
 	}
 
-	user, err = s.users.Get(ctx,id)
+	user, err = s.users.Get(ctx, id)
 
 	return
 }
@@ -150,16 +164,82 @@ func (s *service) ChangePassword(ctx context.Context, authToken string, password
 	return err
 }
 func (s *service) AddNode(ctx context.Context, token string, node Node) (err error) {
-	// TODO implement the business logic of AddNode
-	return err
+	key, err := s.tokenizer.Parse(token)
+	if err != nil {
+		message := errors.New(fmt.Sprintf("invalid token: %v\n", err.Error()))
+		return message
+	}
+	
+	user, err := s.users.Get(ctx, key.Subject)
+
+	if err != nil {
+		message := errors.New(fmt.Sprintf("not found: %s\n",err.Error()))
+		return message
+	}
+	
+	if user.Region != node.Region{
+		message := errors.New("not allowed to add nodes to different region")
+		return message
+	}
+
+	//generate node id
+	uuidv4,err := s.ids.ID()
+	if err != nil {
+		message := errors.New(fmt.Sprintf("could not generate id for node: %s\n",err.Error()))
+		return message
+	}
+
+	//generate key for node (acts as its password)
+	keyStr := s.randomizer.Get(32)
+
+	//capture time of registration
+	created := time.Now().Format(time.RFC3339)
+
+	newNode := Node{
+		UUID:    uuidv4,
+		Addr:    node.Addr,
+		Key:     keyStr,
+		Name:    node.Name,
+		Type:    node.Type,
+		Region:  node.Region,
+		Latd:    node.Latd,
+		Long:    node.Long,
+		Created: created,
+		Master:  node.Master,   //todo: make sure this is filled on req
+	}
+	
+	err = s.nodes.Add(ctx,newNode)
+
+	if err != nil{
+		message := errors.New(fmt.Sprintf("internal error: could not add node to db: %s",err.Error()))
+		return message
+	}
+
+	return nil
+	
 }
 func (s *service) GetNode(ctx context.Context, token string, id string) (node Node, err error) {
-	// TODO implement the business logic of GetNode
-	return node, err
+	_, err = s.tokenizer.Parse(token)
+	if err != nil {
+		message := errors.New(fmt.Sprintf("invalid token: %v\n", err.Error()))
+		return Node{}, message
+	}
+
+	node, err = s.nodes.Get(ctx,id)
+
+	//todo: verify if user is allowed i.e same region with node
+	return
 }
 func (s *service) ListNodes(ctx context.Context, token string, region string) (nodes []Node, err error) {
-	// TODO implement the business logic of ListNodes
-	return nodes, err
+	_,err = s.tokenizer.Parse(token)
+	if err != nil {
+		message := errors.New(fmt.Sprintf("invalid token: %v\n", err.Error()))
+		return nodes,message
+	}
+	nodes,err = s.nodes.List(ctx)
+
+	//todo returns only those of certain region
+	return
 }
 func (s *service) DeleteNode(ctx context.Context, token string, id string) (err error) {
 	// TODO implement the business logic of DeleteNode
@@ -179,9 +259,9 @@ func (s *service) ListRegions(ctx context.Context, token string) (regions []Regi
 }
 
 // NewService returns a naive, stateless implementation of Service.
-func NewService(users UserRepository,nodes NodeRepository,
-	regions RegionRepository,keys KeyRepository,id IDProvider,
-	hasher Hasher,logger log.Logger, tokenizer Tokenizer,
+func NewService(users UserRepository, nodes NodeRepository,
+	regions RegionRepository, keys KeyRepository, id IDProvider,
+	hasher Hasher, logger log.Logger, tokenizer Tokenizer,
 	randomizer Randomizer) Service {
 	return &service{
 		users:      users,

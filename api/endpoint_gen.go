@@ -6,7 +6,6 @@ import (
 	endpoint "github.com/go-kit/kit/endpoint"
 )
 
-
 // NewServerEndpoints returns a Endpoints struct that wraps the provided service, and wires in all of the
 // expected endpoint middlewares
 func MakeServerEndpoints(s registry.Service) Endpoints {

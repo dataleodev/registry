@@ -60,7 +60,7 @@ func MakeClientEndpoints(instance string) (e Endpoints, err error) {
 
 	var listRegionsEndpoint endpoint.Endpoint
 
-	e,err = Endpoints{
+	e, err = Endpoints{
 		AuthThingEndpoint:      authThingEndpoint,
 		RegisterEndpoint:       registerEndpoint,
 		LoginEndpoint:          loginEndpoint,
@@ -117,7 +117,7 @@ func decodeAuthThingResponse(_ context.Context, r *http.Response) (interface{}, 
 //  decode the specific error message from the response body.
 func decodeRegisterResponse(_ context.Context, r *http.Response) (interface{}, error) {
 	if r.StatusCode != http.StatusOK {
-		return nil,  ErrorDecoder(r)
+		return nil, ErrorDecoder(r)
 	}
 	var resp RegisterResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
@@ -130,9 +130,9 @@ func decodeRegisterResponse(_ context.Context, r *http.Response) (interface{}, e
 //  decode the specific error message from the response body.
 func decodeLoginResponse(_ context.Context, r *http.Response) (interface{}, error) {
 	if r.StatusCode != http.StatusOK {
-		return nil,  ErrorDecoder(r)
+		return nil, ErrorDecoder(r)
 	}
-	var resp  LoginResponse
+	var resp LoginResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -143,9 +143,9 @@ func decodeLoginResponse(_ context.Context, r *http.Response) (interface{}, erro
 //  decode the specific error message from the response body.
 func decodeViewUserResponse(_ context.Context, r *http.Response) (interface{}, error) {
 	if r.StatusCode != http.StatusOK {
-		return nil,  ErrorDecoder(r)
+		return nil, ErrorDecoder(r)
 	}
-	var resp  ViewUserResponse
+	var resp ViewUserResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -156,9 +156,9 @@ func decodeViewUserResponse(_ context.Context, r *http.Response) (interface{}, e
 //  decode the specific error message from the response body.
 func decodeListUsersResponse(_ context.Context, r *http.Response) (interface{}, error) {
 	if r.StatusCode != http.StatusOK {
-		return nil,  ErrorDecoder(r)
+		return nil, ErrorDecoder(r)
 	}
-	var resp  ListUsersResponse
+	var resp ListUsersResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -169,9 +169,9 @@ func decodeListUsersResponse(_ context.Context, r *http.Response) (interface{}, 
 //  decode the specific error message from the response body.
 func decodeUpdateUserResponse(_ context.Context, r *http.Response) (interface{}, error) {
 	if r.StatusCode != http.StatusOK {
-		return nil,  ErrorDecoder(r)
+		return nil, ErrorDecoder(r)
 	}
-	var resp  UpdateUserResponse
+	var resp UpdateUserResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -182,9 +182,9 @@ func decodeUpdateUserResponse(_ context.Context, r *http.Response) (interface{},
 //  decode the specific error message from the response body.
 func decodeChangePasswordResponse(_ context.Context, r *http.Response) (interface{}, error) {
 	if r.StatusCode != http.StatusOK {
-		return nil,  ErrorDecoder(r)
+		return nil, ErrorDecoder(r)
 	}
-	var resp  ChangePasswordResponse
+	var resp ChangePasswordResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -195,9 +195,9 @@ func decodeChangePasswordResponse(_ context.Context, r *http.Response) (interfac
 //  decode the specific error message from the response body.
 func decodeAddNodeResponse(_ context.Context, r *http.Response) (interface{}, error) {
 	if r.StatusCode != http.StatusOK {
-		return nil,  ErrorDecoder(r)
+		return nil, ErrorDecoder(r)
 	}
-	var resp  AddNodeResponse
+	var resp AddNodeResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -208,9 +208,9 @@ func decodeAddNodeResponse(_ context.Context, r *http.Response) (interface{}, er
 //  decode the specific error message from the response body.
 func decodeGetNodeResponse(_ context.Context, r *http.Response) (interface{}, error) {
 	if r.StatusCode != http.StatusOK {
-		return nil,  ErrorDecoder(r)
+		return nil, ErrorDecoder(r)
 	}
-	var resp  GetNodeResponse
+	var resp GetNodeResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -221,9 +221,9 @@ func decodeGetNodeResponse(_ context.Context, r *http.Response) (interface{}, er
 //  decode the specific error message from the response body.
 func decodeListNodesResponse(_ context.Context, r *http.Response) (interface{}, error) {
 	if r.StatusCode != http.StatusOK {
-		return nil,  ErrorDecoder(r)
+		return nil, ErrorDecoder(r)
 	}
-	var resp  ListNodesResponse
+	var resp ListNodesResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -234,9 +234,9 @@ func decodeListNodesResponse(_ context.Context, r *http.Response) (interface{}, 
 //  decode the specific error message from the response body.
 func decodeDeleteNodeResponse(_ context.Context, r *http.Response) (interface{}, error) {
 	if r.StatusCode != http.StatusOK {
-		return nil,  ErrorDecoder(r)
+		return nil, ErrorDecoder(r)
 	}
-	var resp  DeleteNodeResponse
+	var resp DeleteNodeResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -247,9 +247,9 @@ func decodeDeleteNodeResponse(_ context.Context, r *http.Response) (interface{},
 //  decode the specific error message from the response body.
 func decodeUpdateNodeResponse(_ context.Context, r *http.Response) (interface{}, error) {
 	if r.StatusCode != http.StatusOK {
-		return nil,  ErrorDecoder(r)
+		return nil, ErrorDecoder(r)
 	}
-	var resp  UpdateNodeResponse
+	var resp UpdateNodeResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -260,9 +260,9 @@ func decodeUpdateNodeResponse(_ context.Context, r *http.Response) (interface{},
 //  decode the specific error message from the response body.
 func decodeAddRegionResponse(_ context.Context, r *http.Response) (interface{}, error) {
 	if r.StatusCode != http.StatusOK {
-		return nil,  ErrorDecoder(r)
+		return nil, ErrorDecoder(r)
 	}
-	var resp  AddRegionResponse
+	var resp AddRegionResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -273,9 +273,9 @@ func decodeAddRegionResponse(_ context.Context, r *http.Response) (interface{}, 
 //  decode the specific error message from the response body.
 func decodeListRegionsResponse(_ context.Context, r *http.Response) (interface{}, error) {
 	if r.StatusCode != http.StatusOK {
-		return nil,  ErrorDecoder(r)
+		return nil, ErrorDecoder(r)
 	}
-	var resp  ListRegionsResponse
+	var resp ListRegionsResponse
 	err := json.NewDecoder(r.Body).Decode(&resp)
 	return resp, err
 }
@@ -285,4 +285,3 @@ func copyURL(base *url.URL, path string) (next *url.URL) {
 	next = &n
 	return
 }
-

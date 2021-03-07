@@ -23,7 +23,7 @@ func MakeHTTPHandler(svc registry.Service, logger log.Logger) http.Handler {
 	}
 
 	//POST /register
-	r.Methods(http.MethodPost,http.MethodPut).Path("/register").Handler(kithttp.NewServer(
+	r.Methods(http.MethodPost, http.MethodPut).Path("/register").Handler(kithttp.NewServer(
 		e.RegisterEndpoint,
 		decodeRegisterRequest,
 		encodeRegisterResponse,
@@ -42,9 +42,8 @@ func MakeHTTPHandler(svc registry.Service, logger log.Logger) http.Handler {
 		e.AuthThingEndpoint,
 		decodeAuthThingRequest,
 		encodeAuthThingResponse,
-		options ...,
+		options...,
 	))
-
 
 	//GET
 	r.Methods(http.MethodGet).Path("/users/{id}").Handler(kithttp.NewServer(
@@ -89,7 +88,7 @@ func encodeRegisterResponse(ctx context.Context, w http.ResponseWriter, response
 // JSON-encoded request from the HTTP request body.
 func decodeLoginRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	uuid, password, ok := r.BasicAuth()
-	if !ok{
+	if !ok {
 		return LoginRequest{}, errors.New("unauthorized")
 	}
 	req := LoginRequest{
@@ -110,7 +109,6 @@ func encodeLoginResponse(ctx context.Context, w http.ResponseWriter, response in
 	err = json.NewEncoder(w).Encode(response)
 	return
 }
-
 
 // decodeAuthThingRequest is a transport/http.DecodeRequestFunc that decodes a
 // JSON-encoded request from the HTTP request body.
@@ -137,7 +135,7 @@ func encodeAuthThingResponse(ctx context.Context, w http.ResponseWriter, respons
 func decodeViewUserRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	vars := mux.Vars(r)
 	id, ok := vars["id"]
-	if !ok{
+	if !ok {
 		return ViewUserRequest{}, errors.New("err bad routing")
 	}
 	reqToken := r.Header.Get("Authorization")
@@ -167,19 +165,18 @@ type regionReq struct {
 	Region string `json:"region"`
 }
 
-
 // decodeListUsersRequest is a transport/http.DecodeRequestFunc that decodes a
 // JSON-encoded request from the HTTP request body.
 func decodeListUsersRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	reqToken := r.Header.Get("Authorization")
 	splitToken := strings.Split(reqToken, "Bearer ")
 	reqToken = splitToken[1]
-	userRegion :=  regionReq{}
+	userRegion := regionReq{}
 	err := json.NewDecoder(r.Body).Decode(&userRegion)
 	if err != nil {
 		return nil, err
 	}
-	args := map[string]string{"region":userRegion.Region}
+	args := map[string]string{"region": userRegion.Region}
 	req := ListUsersRequest{
 		Token: reqToken,
 		Args:  args,
@@ -199,8 +196,6 @@ func encodeListUsersResponse(ctx context.Context, w http.ResponseWriter, respons
 	err = json.NewEncoder(w).Encode(response)
 	return
 }
-
-
 
 func ErrorEncoder(_ context.Context, err error, w http.ResponseWriter) {
 	w.WriteHeader(err2code(err))
@@ -223,4 +218,3 @@ func err2code(err error) int {
 type errorWrapper struct {
 	Error string `json:"error"`
 }
-

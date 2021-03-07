@@ -40,7 +40,7 @@ func (node Node) ValidateMacAddr(macAddr string) bool {
 type Node struct {
 	UUID    string `json:"uuid,omitempty"`
 	Addr    string `json:"addr"`
-	Key     string  `json:"key,omitempty"`
+	Key     string `json:"key,omitempty"`
 	Name    string `json:"name"`
 	Type    int    `json:"type"`
 	Region  string `json:"region"`
@@ -49,7 +49,6 @@ type Node struct {
 	Created string `json:"created,omitempty"`
 	Master  string `json:"master,omitempty"`
 }
-
 
 //50759ce8-1148-4bd8-89e5-5dfbb5133f6c
 //b6858384-b6d2-4cf7-b9ab-56a107e8efc8

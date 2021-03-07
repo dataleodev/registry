@@ -7,15 +7,14 @@ import (
 	"time"
 )
 
-
 var (
-	_ registry.Tokenizer = (*tokenizer)(nil)
-	ErrInvalidToken = errors.New("invalid token")
-	ErrTokenExpired = errors.New("token expired")
+	_               registry.Tokenizer = (*tokenizer)(nil)
+	ErrInvalidToken                    = errors.New("invalid token")
+	ErrTokenExpired                    = errors.New("token expired")
 )
 
 const (
-	issuerName = "igrid-iam-jwt-tokenizer"
+	issuerName   = "igrid-iam-jwt-tokenizer"
 	audienceName = "igrid-iam-server"
 )
 
@@ -29,7 +28,7 @@ func (c claims) Valid() error {
 		return ErrInvalidToken
 	}
 
-	if c.Audience != audienceName{
+	if c.Audience != audienceName {
 		return ErrInvalidToken
 	}
 	return c.StandardClaims.Valid()
@@ -41,15 +40,14 @@ func (c claims) toKey() registry.Key {
 		Purpose:   c.Purpose,
 		Subject:   c.Subject,
 		Audience:  c.Audience,
-		IssuedAt:  time.Unix(c.IssuedAt,0).UTC(),
-		ExpiresAt: time.Unix(c.ExpiresAt,0).UTC(),
+		IssuedAt:  time.Unix(c.IssuedAt, 0).UTC(),
+		ExpiresAt: time.Unix(c.ExpiresAt, 0).UTC(),
 	}
 
 	return key
 }
 
 type tokenizer struct {
-
 	secret string
 }
 
@@ -99,4 +97,3 @@ func (t tokenizer) Parse(token string) (registry.Key, error) {
 	}
 	return c.toKey(), nil
 }
-

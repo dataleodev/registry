@@ -14,10 +14,10 @@ import (
 //iat (issued at time): Time at which the JWT was issued;
 //can be used to determine age of the JWT
 type Key struct {
-	Issuer string `json:"iss"`
+	Issuer    string    `json:"iss"`
 	Purpose   string    `json:"purpose"` //api for things, access and refresh for users,
-	Subject   string    `json:"sub"` //userid
-	Audience  string    `json:"aud"` //igrid-message-bus, igrid-user-services
+	Subject   string    `json:"sub"`     //userid
+	Audience  string    `json:"aud"`     //igrid-message-bus, igrid-user-services
 	IssuedAt  time.Time `json:"iat"`
 	ExpiresAt time.Time `json:"exp"`
 }
@@ -31,7 +31,7 @@ func NewKey(id, purpose string) Key {
 	}
 }
 
-func (key Key)String() string {
+func (key Key) String() string {
 	return fmt.Sprintf("iss: %v, purpose: %v, sub: %v aud: %v, iat: %v, exp: %v\n",
-		key.Issuer,key.Purpose,key.Subject,key.Audience,key.IssuedAt, key.ExpiresAt)
+		key.Issuer, key.Purpose, key.Subject, key.Audience, key.IssuedAt, key.ExpiresAt)
 }

@@ -1,7 +1,6 @@
 package random
 
 import (
-
 	"github.com/dataleodev/registry"
 	"math/rand"
 	"time"

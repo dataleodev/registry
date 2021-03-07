@@ -50,7 +50,7 @@ func main() {
 		SslMode:  "disable",
 	}
 
-	db := connectToDB(dbConfig,log)
+	db := connectToDB(dbConfig, log)
 	defer db.Close()
 
 	tokenizer := jwt.NewTokenizer()
@@ -64,7 +64,7 @@ func main() {
 
 	var s registry.Service
 	{
-		s = registry.NewService(userStore,nodeStore,regionStore,keyStore,up,hasher,l,tokenizer,randomizer)
+		s = registry.NewService(userStore, nodeStore, regionStore, keyStore, up, hasher, l, tokenizer, randomizer)
 		s = api.LoggingMiddleware(l)(s)
 	}
 
@@ -98,4 +98,3 @@ func connectToDB(cfg postgres.DBConfig, logger logger.Logger) *sql.DB {
 	}
 	return db
 }
-
