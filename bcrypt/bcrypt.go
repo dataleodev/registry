@@ -31,8 +31,8 @@ func (bh *bcryptHasher) Hash(pwd string) (string, error) {
 	return string(hash), nil
 }
 
-func (bh *bcryptHasher) Compare(plain, hashed string) error {
-	err := bcrypt.CompareHashAndPassword([]byte(hashed), []byte(plain))
+func (bh *bcryptHasher) Compare(hashedPassword, plainText string) error {
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(plainText))
 	if err != nil {
 		return errors.Wrap(errComparePassword, err)
 	}

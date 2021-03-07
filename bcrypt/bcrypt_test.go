@@ -14,11 +14,7 @@ func TestCompare(t *testing.T) {
 			t.Errorf("could not hash %v\n", err)
 		}
 
-		//	err = bc.Compare(hash,password)
-		//t.Logf("%v\n",err)
-
-		//t.Logf("password then hash: %v\n",err)
-		err = bc.Compare(password, hash)
+		err = bc.Compare(hash,password)
 		t.Logf("%v\n", err)
 
 	})

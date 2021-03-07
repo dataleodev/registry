@@ -98,6 +98,7 @@ func (s *service) Register(ctx context.Context, name string, email string, passw
 		message := errors.New(fmt.Sprintf("could not hash password : %v\n", err.Error()))
 		return "", message
 	}
+	_ = s.log.Log("hash value of password is %s",hashedPassword)
 	user := User{
 		UUID:     uuid,
 		Name:     name,
@@ -118,7 +119,11 @@ func (s *service) Login(ctx context.Context, uuid string, password string) (toke
 		message := errors.New(fmt.Sprintf("could not retrieve user of id : %v : %v\n", uuid, err.Error()))
 		return "", message
 	}
-	err = s.hasher.Compare(password, user.Password)
+
+	_ = s.log.Log("from db hash value is %s", user.Password)
+	_ = s.log.Log("from basic auth has value is %s", password)
+
+	err = s.hasher.Compare(user.Password,password)
 	if err != nil {
 		message := errors.New(fmt.Sprintf("invalid ceredentials: %v\n", err.Error()))
 		return "", message
@@ -152,7 +157,7 @@ func (s *service) ViewUser(ctx context.Context, token string, id string) (user U
 	return
 }
 func (s *service) ListUsers(ctx context.Context, token string, args map[string]string) (users []User, err error) {
-	// TODO implement the business logic of ListUsers
+	users, err = s.users.List(ctx)
 	return users, err
 }
 func (s *service) UpdateUser(ctx context.Context, token string, user User) (err error) {

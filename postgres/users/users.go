@@ -76,7 +76,7 @@ func (p postgres) Get(ctx context.Context, id string) (registry.User, error) {
 
 	switch err := row.Scan(
 		&dUser.ID, &dUser.Name, &dUser.Email,
-		&dUser.Password, &dUser.Region, &dUser.Created); err {
+		&dUser.Region, &dUser.Password, &dUser.Created); err {
 
 	case sql.ErrNoRows:
 		return registry.User{}, ErrUserNotFound
@@ -90,6 +90,12 @@ func (p postgres) Get(ctx context.Context, id string) (registry.User, error) {
 }
 
 func (p postgres) Add(ctx context.Context, user registry.User) error {
+	// id VARCHAR(100) UNIQUE NOT NULL PRIMARY KEY,
+	//    name VARCHAR(100) UNIQUE NOT NULL,
+	//    email VARCHAR(100) UNIQUE NOT NULL,
+	//    region VARCHAR(100) UNIQUE NOT NULL,
+	//    password VARCHAR(100) UNIQUE NOT NULL,
+	//    created VARCHAR(100) UNIQUE NOT NULL
 
 	dUser, err := fromUser(user)
 
@@ -98,7 +104,7 @@ func (p postgres) Add(ctx context.Context, user registry.User) error {
 	}
 
 	_, err = p.db.Exec(regsql.UserInsertNew,
-		dUser.ID, dUser.Name, dUser.Email, dUser.Password, dUser.Region, dUser.Created)
+		dUser.ID, dUser.Name, dUser.Email, dUser.Region, dUser.Password, dUser.Created)
 
 	if err != nil {
 		return err

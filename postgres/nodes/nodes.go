@@ -23,16 +23,7 @@ func NewRepository(db *sql.DB) registry.NodeRepository {
 func (p postgres) Get(ctx context.Context, id string) (node registry.Node,err error) {
 	q := "SELECT * FROM nodes WHERE uuid=$1"
 	row := p.db.QueryRow(q, id)
-	//  UUID    string `json:"uuid,omitempty"`
-	//	Addr    string `json:"addr"`
-	//	Key     string `json:"key,omitempty"`
-	//	Name    string `json:"name"`
-	//	Type    int    `json:"type"`
-	//	Region  string `json:"region"`
-	//	Latd    string `json:"latitude"`
-	//	Long    string `json:"longitude"`
-	//	Created string `json:"created,omitempty"`
-	//	Master  string `json:"master,omitempty"`
+
 	switch err := row.Scan(
 		&node.UUID,
 		&node.Addr,
