@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/dataleodev/registry"
 	"github.com/dataleodev/registry/pkg/errors"
 	"github.com/go-kit/kit/log"
@@ -21,6 +22,22 @@ func MakeHTTPHandler(svc registry.Service, logger log.Logger) http.Handler {
 		kithttp.ServerErrorHandler(transport.NewLogErrorHandler(logger)),
 		kithttp.ServerErrorEncoder(ErrorEncoder),
 	}
+
+	//PUT /nodes
+	r.Methods(http.MethodGet).Path("/auth/{id}").Handler(kithttp.NewServer(
+		e.AuthThingEndpoint,
+		decodeAuthThingRequest,
+		encodeAuthThingResponse,
+		options...,
+	))
+
+	//PUT /nodes
+	r.Methods(http.MethodPost, http.MethodPut).Path("/nodes").Handler(kithttp.NewServer(
+		e.AddNodeEndpoint,
+		decodeAddNodeRequest,
+		encodeAddNodeResponse,
+		options...,
+		))
 
 	//POST /register
 	r.Methods(http.MethodPost, http.MethodPut).Path("/register").Handler(kithttp.NewServer(
@@ -84,6 +101,33 @@ func encodeRegisterResponse(ctx context.Context, w http.ResponseWriter, response
 	return
 }
 
+// decodeRegisterRequest is a transport/http.DecodeRequestFunc that decodes a
+// JSON-encoded request from the HTTP request body.
+func decodeAddNodeRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	node := registry.Node{}
+	err := json.NewDecoder(r.Body).Decode(&node)
+	reqToken := r.Header.Get("Authorization")
+	splitToken := strings.Split(reqToken, "Bearer ")
+	reqToken = splitToken[1]
+	req := AddNodeRequest{
+		Token: reqToken,
+		Node:  node,
+	}
+	return req, err
+}
+
+// encodeRegisterResponse is a transport/http.EncodeResponseFunc that encodes
+// the response as JSON to the response writer
+func encodeAddNodeResponse(ctx context.Context, w http.ResponseWriter, response interface{}) (err error) {
+	if f, ok := response.(Failure); ok && f.Failed() != nil {
+		ErrorEncoder(ctx, f.Failed(), w)
+		return nil
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	err = json.NewEncoder(w).Encode(response)
+	return
+}
+
 // decodeLoginRequest is a transport/http.DecodeRequestFunc that decodes a
 // JSON-encoded request from the HTTP request body.
 func decodeLoginRequest(_ context.Context, r *http.Request) (interface{}, error) {
@@ -113,9 +157,25 @@ func encodeLoginResponse(ctx context.Context, w http.ResponseWriter, response in
 // decodeAuthThingRequest is a transport/http.DecodeRequestFunc that decodes a
 // JSON-encoded request from the HTTP request body.
 func decodeAuthThingRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	req := AuthThingRequest{}
-	err := json.NewDecoder(r.Body).Decode(&req)
-	return req, err
+	vars := mux.Vars(r)
+	id, ok := vars["id"]
+	if !ok {
+		return AuthThingRequest{}, errors.New("err bad routing")
+	}
+	apiKey := r.Header.Get("X-API-KEY")
+
+	if apiKey == ""{
+		return AuthThingRequest{}, errors.New(fmt.Sprintf("not authorized: api key is %s\n",apiKey))
+	}
+	//splitToken := strings.Split(apiKey, "X-API-KEY ")
+	//apiKey = splitToken[1]
+	fmt.Printf("api key: %v\n", apiKey)
+
+	req := AuthThingRequest{
+		Uuid:      id,
+		AuthToken: apiKey,
+	}
+	return req, nil
 }
 
 // encodeAuthThingResponse is a transport/http.EncodeResponseFunc that encodes
@@ -125,6 +185,7 @@ func encodeAuthThingResponse(ctx context.Context, w http.ResponseWriter, respons
 		ErrorEncoder(ctx, f.Failed(), w)
 		return nil
 	}
+
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	err = json.NewEncoder(w).Encode(response)
 	return
@@ -171,12 +232,12 @@ func decodeListUsersRequest(_ context.Context, r *http.Request) (interface{}, er
 	reqToken := r.Header.Get("Authorization")
 	splitToken := strings.Split(reqToken, "Bearer ")
 	reqToken = splitToken[1]
-	userRegion := regionReq{}
-	err := json.NewDecoder(r.Body).Decode(&userRegion)
-	if err != nil {
-		return nil, err
-	}
-	args := map[string]string{"region": userRegion.Region}
+	//userRegion := regionReq{}
+	//err := json.NewDecoder(r.Body).Decode(&userRegion)
+	//if err != nil {
+	//	return nil, err
+	//}
+	args := map[string]string{"region": "nothing"}
 	req := ListUsersRequest{
 		Token: reqToken,
 		Args:  args,
@@ -198,6 +259,7 @@ func encodeListUsersResponse(ctx context.Context, w http.ResponseWriter, respons
 }
 
 func ErrorEncoder(_ context.Context, err error, w http.ResponseWriter) {
+	w.Header().Set("Content-Type","application/json")
 	w.WriteHeader(err2code(err))
 	json.NewEncoder(w).Encode(errorWrapper{Error: err.Error()})
 }

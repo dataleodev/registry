@@ -42,7 +42,7 @@ func main() {
 	}
 
 	dbConfig := postgres.DBConfig{
-		Hostname: "172.17.0.2",
+		Hostname: "127.0.0.1",
 		Port:     "5432",
 		User:     "postgres",
 		Password: "postgres",

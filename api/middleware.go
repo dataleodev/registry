@@ -16,7 +16,10 @@ type loggingMiddleware struct {
 }
 
 func (l loggingMiddleware) AuthThing(ctx context.Context, uuid string, authToken string) (node registry.Node, err error) {
-	panic("implement me")
+	defer func() {
+		l.logger.Log("method", "AuthThing", "uuid", uuid, "key", authToken, "node",node,"err", err)
+	}()
+	return l.next.AuthThing(ctx, uuid,authToken)
 }
 
 // LoggingMiddleware takes a logger as a dependency

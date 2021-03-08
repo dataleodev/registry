@@ -35,8 +35,26 @@ func MakeClientEndpoints(instance string) (e Endpoints, err error) {
 	}
 
 	var registerEndpoint endpoint.Endpoint
+	{
+		registerEndpoint = kithttp.NewClient(
+			http.MethodPost,
+			tgt,
+			encodeRegisterRequest,
+			decodeRegisterResponse,
+			options ...).Endpoint()
+
+	}
 
 	var loginEndpoint endpoint.Endpoint
+	{
+		loginEndpoint = kithttp.NewClient(
+			http.MethodGet,
+			tgt,
+			encodeLoginRequest,
+			decodeRegisterResponse,
+			options ...).Endpoint()
+
+	}
 
 	var viewUserEndpoint endpoint.Endpoint
 
@@ -78,6 +96,20 @@ func MakeClientEndpoints(instance string) (e Endpoints, err error) {
 	}, nil
 
 	return
+}
+
+func encodeLoginRequest(ctx context.Context, req *http.Request, request interface{}) error {
+	// r.Methods("GET").Path("/auth")
+	req.URL.Path = "/login"
+	//reqBody, _ := request.(LoginRequest)
+	//req.SetBasicAuth(reqBody.Uuid,reqBody.Password)
+	return encodeHTTPGenericRequest(ctx, req, request)
+}
+
+func encodeRegisterRequest(ctx context.Context, req *http.Request, request interface{}) error {
+	// r.Methods("GET").Path("/auth")
+	req.URL.Path = "/register"
+	return encodeHTTPGenericRequest(ctx, req, request)
 }
 
 func encodeAuthThingRequest(ctx context.Context, req *http.Request, request interface{}) error {

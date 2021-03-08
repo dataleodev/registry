@@ -17,6 +17,7 @@ package cli
 
 import (
 	"fmt"
+	"github.com/dataleodev/registry/api"
 	"github.com/spf13/cobra"
 	"os"
 
@@ -56,9 +57,13 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.regctl.yaml)")
 
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	edps,err := api.MakeClientEndpoints("localhost:8080")
+	if err != nil {
+		os.Exit(1)
+	}
+	runner := NewCommandRunner(edps)
+	commands := MakeAllCommands(runner)
+	rootCmd.AddCommand(commands.Login)
 }
 
 // initConfig reads in config file and ENV variables if set.

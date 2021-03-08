@@ -117,8 +117,35 @@ func (p postgres) Delete(ctx context.Context, id string) error {
 	panic("implement me")
 }
 
-func (p postgres) List(ctx context.Context) ([]registry.User, error) {
-	panic("implement me")
+func (p postgres) List(ctx context.Context) (users []registry.User, err error) {
+	rows, err := p.db.Query("SELECT * FROM users")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var user registry.User
+
+		err = rows.Scan(
+			&user.UUID,
+			&user.Name,
+			&user.Email,
+			&user.Region,
+			&user.Password,
+			&user.Created,
+		)
+		if err != nil {
+			return users, err
+		}
+		users = append(users,user)
+	}
+	// get any error encountered during iteration
+	err = rows.Err()
+	if err != nil {
+		return users, err
+	}
+
+	return
 }
 
 func (p postgres) Update(ctx context.Context, id string, user registry.User) (registry.User, error) {

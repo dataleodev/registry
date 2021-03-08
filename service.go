@@ -74,17 +74,18 @@ type service struct {
 }
 
 func (s *service) AuthThing(ctx context.Context, nodeId string, authToken string) (node Node, err error) {
-	_, err = s.tokenizer.Parse(authToken)
-	if err != nil {
-		message := errors.New(fmt.Sprintf("invalid token: %v\n", err.Error()))
-		return Node{}, message
-	}
-
-	//todo: check for allowed apps (regctl) and people
 
 	node,err = s.nodes.Get(ctx,nodeId)
 
-	return
+	if err !=nil{
+		return Node{}, err
+	}
+
+	if node.Key != authToken{
+		return Node{}, err
+	}
+
+	return node,nil
 }
 
 func (s *service) Register(ctx context.Context, name string, email string, password, region string) (uuid string, err error) {
@@ -171,7 +172,7 @@ func (s *service) ChangePassword(ctx context.Context, authToken string, password
 func (s *service) AddNode(ctx context.Context, token string, node Node) (err error) {
 	key, err := s.tokenizer.Parse(token)
 	if err != nil {
-		message := errors.New(fmt.Sprintf("invalid token: %v\n", err.Error()))
+		message := errors.New(fmt.Sprintf("%v\n", err.Error()))
 		return message
 	}
 	
@@ -199,6 +200,10 @@ func (s *service) AddNode(ctx context.Context, token string, node Node) (err err
 
 	//capture time of registration
 	created := time.Now().Format(time.RFC3339)
+
+	if node.Master == "" || node.Master == "na"{
+		node.Master = "master"
+	}
 
 	newNode := Node{
 		UUID:    uuidv4,
@@ -255,12 +260,22 @@ func (s *service) UpdateNode(ctx context.Context, token string, id string, node 
 	return err
 }
 func (s *service) AddRegion(ctx context.Context, token string, region Region) (err error) {
-	// TODO implement the business logic of AddRegion
-	return err
+	_,err = s.tokenizer.Parse(token)
+	if err != nil{
+		message := errors.New(fmt.Sprintf("invalid credentials %s\n",err.Error()))
+		return message
+	}
+	err = s.regions.Add(ctx,region)
+	return
 }
 func (s *service) ListRegions(ctx context.Context, token string) (regions []Region, err error) {
-	// TODO implement the business logic of ListRegions
-	return regions, err
+	_,err = s.tokenizer.Parse(token)
+	if err != nil{
+		message := errors.New(fmt.Sprintf("invalid credentials %s\n",err.Error()))
+		return nil,message
+	}
+	regions,err = s.regions.List(ctx)
+	return
 }
 
 // NewService returns a naive, stateless implementation of Service.
